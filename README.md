@@ -1,132 +1,137 @@
 # 🕊️ Palavra Viva — Consolo & Direção na Bíblia Sagrada
 
-> **Um refúgio espiritual digital que acolhe o que você sente e responde com uma passagem bíblica real, 100% verificada, livre de alucinações.**
+> **Site moderno desenvolvido em Next.js 14, React e Tailwind CSS, otimizado para deploy gratuito na Vercel ou Cloudflare, com Inteligência Artificial e 100% livre de alucinações bíblicas.**
 
 ---
 
-## 🌟 Sobre o Projeto
+## 🌟 Sobre o Site
 
-O **Palavra Viva** é uma aplicação web moderna, serena e acolhedora desenvolvida para conectar o coração humano à Palavra de Deus. 
+O **Palavra Viva** é um site leve, sereno e responsivo (mobile-first) onde o usuário pode abrir o seu coração, descrever como se sente (ou tocar em sentimentos rápidos) e receber:
 
-O usuário expressa livremente como se sente (ansiedade, tristeza, luto, cansaço, gratidão, necessidade de perdão, busca por direção) ou seleciona sentimentos pré-definidos, e a aplicação retorna:
-- 📖 **Passagem Bíblica Verificada** (na versão NVI ou Almeida Atualizada).
-- 🕊️ **Reflexão Pastoral Acolhedora** (sem julgamentos, com amor cristão e esperança).
-- 📜 **Contexto Bíblico Original** (para compreensão fidedigna sem descontextualização).
-- 🙏 **Oração Pessoal Conduzida** (para a pessoa falar com Deus naquele momento).
-- 💡 **Passo Prático de Fé** (um exercício simples e tranquilizador para o dia de hoje).
-- 🔊 **Áudio da Passagem** (ouça o versículo narrado com voz serena).
-- 📱 **Compartilhar no WhatsApp** (link formatado com emojis pronto para envio ou status).
-- 📖 **Ler o Capítulo Completo** (leitor integrado para mergulhar no contexto de toda a passagem).
+- 📖 **Passagem Bíblica Verificada:** Texto sagrado literal extraído da base canônica (versões **NVI** ou **Almeida Atualizada**).
+- 🕊️ **Reflexão Pastoral & Acolhedora:** Uma mensagem carinhosa gerada para tocar a situação específica, sem julgamentos.
+- 📜 **Contexto Bíblico Original:** 1 a 2 frases para compreender o sentido fiel do texto histórico.
+- 🙏 **Oração Pessoal Conduzida:** Uma prece sincera e íntima em primeira pessoa para o usuário orar.
+- 💡 **Passo Prático de Fé:** Uma atitude simples e reconfortante para o dia.
+- 🔊 **Áudio Narrado:** Voz natural em português via Web Speech API (zero latência e sem custo de servidores).
+- 📱 **Compartilhar no WhatsApp:** Botão com mensagem pronta e formatada para enviar a amigos ou postar no Status.
+- 📖 **Leitor do Capítulo Completo:** Modal dinâmico para mergulhar em todo o contexto bíblico com destaque dourado nos versículos selecionados.
 
 ---
 
 ## 🛡️ Arquitetura Anti-Alucinação (Zero Fake Verses)
 
-Muitas IAs generativas têm o vício de "alucinar" versículos (inventando frases com som bíblico ou citando capítulos inexistentes). O **Palavra Viva** resolve isso com uma arquitetura de duas etapas com **Grounding Estrito**:
+Ao contrário de sites que deixam IAs gerativas "recitarem" versículos de memória (o que quase sempre gera versículos inventados ou números trocados), o **Palavra Viva** utiliza um **pipeline de auditoria canônica estrita**:
 
 ```mermaid
 flowchart TD
-    A["Usuário expressa como se sente"] --> B["LLM analisa sentimento e indica Livro/Capítulo/Versículo"]
-    B --> C["Validador Python verifica na base local SQLite (62.000+ versículos)"]
-    C -->|Versículo existe| D["Extração do Texto Literal Autêntico da Bíblia"]
-    C -->|Versículo inexistente ou IA offline| E["Fallback para Catálogo Canônico Curado / FTS5"]
-    E --> D
-    D --> F["LLM gera Reflexão Pastoral e Oração usando APENAS o texto bíblico real"]
-    F --> G["Exibição com Áudio, WhatsApp e Leitura Completa"]
+    A["Usuário expressa o que sente"] --> B["API Serverless /api/counsel"]
+    B --> C["LLM Gemini analisa a dor/sentimento e indica Livro/Capítulo/Versículo"]
+    C --> D["Auditoria Canônica no Backend (62.191 versículos reais)"]
+    D -->|Versículo existe| E["Extração do Texto Literal Autêntico"]
+    D -->|Versículo inexistente ou IA sem chave| F["Fallback para Catálogo Temático Curado"]
+    F --> E
+    E --> G["LLM gera Reflexão Pastoral e Oração sobre o texto verificado"]
+    G --> H["Interface Web moderna (Next.js)"]
 ```
 
-1. **Etapa 1 (Intenção Espiritual):** A IA identifica o núcleo emocional e seleciona a melhor referência canônica (ex: *Filipenses 4:6-7*).
-2. **Etapa 2 (Auditoria Canônica):** O backend consulta a base de dados SQLite local com todos os 66 livros bíblicos canônicos.
-3. **Etapa 3 (Garantia de Autenticidade):** Apenas o texto literal autêntico da Bíblia é enviado para a tela e para a reflexão devocional. Se a IA sugerir qualquer referência inválida, o sistema auto-corrige e recorre ao acervo canônico curado.
-4. **Modo Offline / Sem Chave:** Mesmo sem nenhuma chave de API configurada, o app funciona 100% usando o motor de busca semântico local e acervo temático.
+1. **A IA NÃO inventa texto bíblico:** Ela apenas atua como conselheira e sugere o livro/capítulo canônico.
+2. **Auditoria Canônica em Tempo Real:** O backend serverless busca o texto literal na base canônica dos 66 livros da Bíblia protestante.
+3. **Resguardo 100%:** Se a IA indicar qualquer referência incorreta, o validador substitui pelo tema canônico mais próximo. **Nenhum versículo falso é exibido.**
+4. **Funciona até sem chave de IA:** Mesmo sem chave do Gemini configurada, o site funciona perfeitamente utilizando o motor local de correspondência bíblica.
 
 ---
 
-## 🚀 Como Colocar no Ar em Servidor Gratuito (Streamlit Cloud)
+## 🚀 Como Colocar no Ar Grátis na Vercel (Em 2 Minutos)
 
-Você pode publicar o **Palavra Viva** na internet em menos de 2 minutos sem gastar nada:
+O projeto foi configurado com suporte nativo para a **Vercel**:
 
-### 1. Criar o Repositório no GitHub
-1. Crie um novo repositório no seu GitHub (ex: `palavra-viva`).
-2. Faça o push dos arquivos desta pasta para o repositório:
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit - Palavra Viva"
-   git branch -M main
-   git remote add origin https://github.com/SEU_USUARIO/palavra-viva.git
-   git push -u origin main
-   ```
+### 1. Enviar o Código para o seu GitHub
+Abra o terminal na pasta do projeto e envie para o seu repositório:
+```bash
+git remote add origin https://github.com/SEU_USUARIO/palavra-viva.git
+git push -u origin main
+```
 
-### 2. Conectar ao Streamlit Community Cloud (Gratuito)
-1. Acesse **[share.streamlit.io](https://share.streamlit.io/)** e faça login com sua conta do GitHub.
-2. Clique no botão **"New app"**.
-3. Selecione o repositório `palavra-viva`, branch `main` e arquivo principal `app.py`.
-4. Em **Advanced settings** (opcional), adicione o segredo da sua API do Gemini:
-   ```toml
-   GEMINI_API_KEY = "sua_chave_aqui"
-   ```
-5. Clique em **"Deploy!"**. Em cerca de 1 minuto, seu site estará no ar com HTTPS gratuito!
+### 2. Importar na Vercel (Gratuito)
+1. Acesse **[vercel.com](https://vercel.com/)** e faça login com sua conta do GitHub.
+2. Clique em **"Add New..."** ➔ **"Project"**.
+3. Selecione o repositório `palavra-viva`.
+4. (Opcional) Em **Environment Variables**, adicione sua chave gratuita do Gemini:
+   - `GEMINI_API_KEY`: `sua_chave_aqui`
+5. Clique em **"Deploy"**.
+6. Pronto! Em menos de 1 minuto seu site estará no ar com HTTPS gratuito em `https://palavra-viva.vercel.app`.
 
 ---
 
-## 🔑 Como Obter a Chave Gratuita do Google Gemini
+## 🌐 Como Subir no Cloudflare Pages
+
+O projeto também pode ser publicado no **Cloudflare Pages**:
+1. No painel do Cloudflare, vá em **Workers & Pages** ➔ **Create application** ➔ **Pages**.
+2. Conecte sua conta do GitHub e selecione o repositório `palavra-viva`.
+3. Defina o Build preset como **Next.js**.
+4. Configure a variável de ambiente `GEMINI_API_KEY` (se desejar).
+5. Clique em **Save and Deploy**.
+
+---
+
+## 💻 Como Rodar Localmente no seu Computador
+
+Requisitos: Node.js 18+ instalado.
+
+```bash
+# 1. Acesse a pasta do projeto
+cd palavra-viva
+
+# 2. Instale as dependências (já instaladas localmente)
+npm install
+
+# 3. Inicie o servidor de desenvolvimento
+npm run dev
+```
+
+Abra o seu navegador e acesse: **`http://localhost:3000`**.
+
+---
+
+## 🔑 Como Obter a Chave Gratuita do Gemini (Opcional)
 
 1. Acesse o **[Google AI Studio](https://aistudio.google.com/)**.
 2. Faça login com qualquer conta Google.
-3. Clique em **"Get API key"** e em seguida em **"Create API key"**.
-4. Copie a chave gerada e cole no campo da barra lateral do app ou salve nos Secrets do Streamlit Cloud.
-> *O plano gratuito do Google AI Studio oferece até 15 requisições por minuto sem custo.*
+3. Clique em **"Get API key"** ➔ **"Create API key"**.
+4. Você pode configurar essa chave como variável de ambiente no servidor (`GEMINI_API_KEY`) ou informá-la diretamente pelo botão de **Configurações** na interface do site (fica salva no seu navegador).
 
 ---
 
-## 💻 Como Rodar Localmente
-
-Certifique-se de ter o Python 3.10+ instalado:
-
-```bash
-# Clone o repositório
-git clone https://github.com/SEU_USUARIO/palavra-viva.git
-cd palavra-viva
-
-# Instale as dependências
-pip install -r requirements.txt
-
-# Execute a aplicação
-streamlit run app.py
-```
-
-O site abrirá automaticamente no seu navegador em `http://localhost:8501`.
-
----
-
-## 📁 Estrutura de Arquivos
+## 📁 Estrutura de Pastas do Site
 
 ```
 palavra-viva/
-├── app.py                      # Aplicação web principal em Streamlit
-├── requirements.txt            # Dependências do projeto (streamlit, gTTS, google-generativeai)
-├── README.md                   # Documentação completa
-├── .gitignore                  # Arquivos ignorados pelo controle de versão
-├── .streamlit/
-│   └── config.toml             # Tema sereno personalizado (cores e tipografia)
-├── .github/
-│   └── workflows/
-│       └── keep_alive.yml      # Ação opcional para manter o app sempre acordado
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   │   ├── counsel/route.ts  # Endpoint serverless de aconselhamento com auditoria
+│   │   │   ├── chapter/route.ts  # Endpoint para leitura do capítulo completo
+│   │   │   └── themes/route.ts   # Endpoint de catálogo temático
+│   │   ├── globals.css           # Estilos globais e Tailwind CSS
+│   │   ├── layout.tsx            # Estrutura HTML, fontes serifadas e metadados SEO
+│   │   └── page.tsx              # Página inicial interativa
+│   ├── components/
+│   │   ├── Header.tsx            # Cabeçalho com logo, status e configurações
+│   │   ├── SentimentChips.tsx    # Pílulas rápidas de estado emocional
+│   │   ├── VerseCard.tsx         # Cartão sagrado, áudio, WhatsApp e cópia
+│   │   ├── DevotionalTabs.tsx    # Abas devocionais (Pastoral, Oração, Contexto, Ação)
+│   │   ├── ChapterModal.tsx      # Modal de leitura do capítulo bíblico completo
+│   │   ├── SettingsModal.tsx     # Modal de preferência de versão (NVI/AA) e chave IA
+│   │   └── Footer.tsx            # Rodapé sereno
+│   └── lib/
+│       └── bible.ts              # Motor canônico anti-alucinação e indexador bíblico
 ├── data/
-│   ├── pt_nvi.json             # Bíblia Nova Versão Internacional completa
-│   ├── pt_aa.json              # Bíblia Almeida Atualizada completa
-│   └── thematic_catalog.json   # Acervo canônico curado de temas de aconselhamento
-└── services/
-    ├── bible_db.py             # Gerenciador da base SQLite com busca FTS5 e verificação
-    ├── thematic_engine.py      # Motor de busca por pontuação de sentimento
-    ├── llm_service.py          # Integração Gemini com Grounding Anti-Alucinação
-    └── audio_service.py        # Narração de áudio da passagem
+│   ├── pt_nvi.json               # Bíblia NVI completa (66 livros canônicos)
+│   ├── pt_aa.json                # Bíblia Almeida Atualizada completa
+│   └── thematic_catalog.json     # Catálogo temático curado com orações
+├── package.json                  # Dependências e scripts Next.js
+├── tailwind.config.ts            # Cores sagradas douradas e tipografia
+├── tsconfig.json                 # Configuração TypeScript
+└── vercel.json                   # Configuração de deploy Vercel
 ```
-
----
-
-## 🕊️ Licença e Direitos
-
-- Textos bíblicos em domínio público / uso justo devocional.
-- Código sob licença MIT — sinta-se livre para usar, compartilhar e abençoar vidas.

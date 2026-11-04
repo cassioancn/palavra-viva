@@ -1,21 +1,21 @@
-# Ambientes Virtuais
-venv/
-.venv/
-env/
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
 
-# Python Cache
-__pycache__/
-*.py[cod]
-*$py.class
+# next.js
+/.next/
+/out/
+/build
 
-# Variáveis de ambiente & Segredos
+# local env files
+.env*.local
 .env
-.env.local
-.streamlit/secrets.toml
 
-# Banco de dados gerado em runtime (auto-gerado em 2s a partir de pt_nvi.json e pt_aa.json)
-data/bible.db
+# vercel
+.vercel
 
-# Logs & temporários
+# debug & misc
 *.log
 .DS_Store
+next-env.d.ts
