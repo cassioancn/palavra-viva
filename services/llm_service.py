@@ -1,7 +1,10 @@
 import os
 import json
 import re
+import warnings
 from typing import Optional, Dict, Any
+
+warnings.filterwarnings("ignore", category=FutureWarning)
 import google.generativeai as genai
 from services.bible_db import get_passage, normalize_book_name, search_verses_fts
 from services.thematic_engine import match_theme_by_text, build_thematic_response
