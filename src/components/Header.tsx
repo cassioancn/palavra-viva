@@ -1,15 +1,14 @@
 "use client";
 
 import React from "react";
-import { Sparkles, SlidersHorizontal, BookOpen } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 
 interface HeaderProps {
   version: "nvi" | "aa";
   onOpenSettings: () => void;
-  hasCustomKey: boolean;
 }
 
-export function Header({ version, onOpenSettings, hasCustomKey }: HeaderProps) {
+export function Header({ version, onOpenSettings }: HeaderProps) {
   return (
     <header className="w-full border-b border-sanctuary-700/60 bg-sanctuary-900/60 backdrop-blur-md sticky top-0 z-30 transition-all">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
@@ -35,25 +34,13 @@ export function Header({ version, onOpenSettings, hasCustomKey }: HeaderProps) {
 
         {/* Action Controls */}
         <div className="flex items-center gap-2">
-          {hasCustomKey ? (
-            <div className="hidden sm:flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              IA Gemini Ativa
-            </div>
-          ) : (
-            <div className="hidden sm:flex items-center gap-1.5 text-xs text-sky-400 bg-sky-500/10 border border-sky-500/20 px-2.5 py-1 rounded-full">
-              <BookOpen className="w-3 h-3" />
-              Acervo Local
-            </div>
-          )}
-
           <button
             onClick={onOpenSettings}
             className="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-300 hover:text-sacred-300 bg-sanctuary-800 hover:bg-sanctuary-700/80 border border-sanctuary-600 px-3 py-1.5 rounded-lg transition-colors shadow-sm"
-            title="Configurações & Tradução"
+            title="Alterar Tradução da Bíblia"
           >
             <SlidersHorizontal className="w-4 h-4 text-sacred-400" />
-            <span className="hidden sm:inline">Configurações</span>
+            <span>Versão: <strong className="text-sacred-300">{version.toUpperCase()}</strong></span>
           </button>
         </div>
       </div>

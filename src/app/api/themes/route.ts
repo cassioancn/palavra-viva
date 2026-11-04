@@ -5,3 +5,4 @@ export async function GET() {
   const themes = listAllThemes();
   return NextResponse.json({ themes });
 }
+

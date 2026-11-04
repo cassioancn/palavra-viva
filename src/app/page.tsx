@@ -13,7 +13,6 @@ import { Sparkles, Send, Loader2, RotateCcw, AlertCircle } from "lucide-react";
 export default function HomePage() {
   const [feeling, setFeeling] = useState("");
   const [version, setVersion] = useState<"nvi" | "aa">("nvi");
-  const [apiKey, setApiKey] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [result, setResult] = useState<any | null>(null);
@@ -35,25 +34,19 @@ export default function HomePage() {
 
   const resultRef = useRef<HTMLDivElement>(null);
 
-  // Load preferences from localStorage on mount
+  // Load version preference from localStorage on mount
   useEffect(() => {
     if (typeof window !== "undefined") {
       const savedVersion = localStorage.getItem("palavra_viva_version");
       if (savedVersion === "aa" || savedVersion === "nvi") {
         setVersion(savedVersion);
       }
-      const savedKey = localStorage.getItem("palavra_viva_gemini_key");
-      if (savedKey) {
-        setApiKey(savedKey);
-      }
     }
   }, []);
 
-  const handleSaveSettings = (newKey: string, newVersion: "nvi" | "aa") => {
-    setApiKey(newKey);
+  const handleSaveSettings = (newVersion: "nvi" | "aa") => {
     setVersion(newVersion);
     if (typeof window !== "undefined") {
-      localStorage.setItem("palavra_viva_gemini_key", newKey);
       localStorage.setItem("palavra_viva_version", newVersion);
     }
   };
@@ -72,7 +65,6 @@ export default function HomePage() {
         body: JSON.stringify({
           feeling: query,
           version,
-          apiKey: apiKey || undefined,
         }),
       });
 
@@ -113,7 +105,6 @@ export default function HomePage() {
     <>
       <Header
         version={version}
-        hasCustomKey={Boolean(apiKey)}
         onOpenSettings={() => setIsSettingsOpen(true)}
       />
 
@@ -236,7 +227,6 @@ export default function HomePage() {
 
       <SettingsModal
         isOpen={isSettingsOpen}
-        apiKey={apiKey}
         version={version}
         onSave={handleSaveSettings}
         onClose={() => setIsSettingsOpen(false)}

@@ -10,7 +10,6 @@ import {
 interface RequestBody {
   feeling: string;
   version?: "nvi" | "aa";
-  apiKey?: string;
 }
 
 function cleanJsonResponse(raw: string): string {
@@ -26,7 +25,7 @@ export async function POST(req: NextRequest) {
     const body: RequestBody = await req.json();
     const feeling = body.feeling?.trim() || "";
     const version = (body.version === "aa" ? "aa" : "nvi") as "nvi" | "aa";
-    const apiKey = body.apiKey?.trim() || process.env.GEMINI_API_KEY || "";
+    const apiKey = process.env.GEMINI_API_KEY || "";
 
     if (!feeling) {
       return NextResponse.json(
@@ -35,15 +34,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Se nenhuma chave de IA foi fornecida, utiliza o catálogo canônico curado
+    // Se nenhuma chave de IA foi configurada no servidor, utiliza o catálogo canônico curado
     if (!apiKey) {
       const theme = matchThemeByText(feeling);
       if (theme) {
-        const resp = buildThematicResponse(theme, version);
-        return NextResponse.json({
-          ...resp,
-          notice: "Modo Bíblico Local (Adicione sua chave Gemini gratuita para reflexões geradas por IA em tempo real).",
-        });
+        return NextResponse.json(buildThematicResponse(theme, version));
       }
 
       // Se nenhum tema der pontuação suficiente, retorna um versículo de paz
@@ -62,7 +57,6 @@ export async function POST(req: NextRequest) {
         practicalStep:
           "Feche os olhos por alguns instantes, respire fundo e repita este versículo em seu pensamento como uma oração de entrega.",
         alternativePassages: [],
-        notice: "Modo Bíblico Local (chave de IA opcional não detectada).",
       });
     }
 
@@ -208,3 +202,4 @@ Responda ESTRITAMENTE em formato JSON:
     );
   }
 }
+
