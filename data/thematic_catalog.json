@@ -1,0 +1,237 @@
+{
+  "themes": [
+    {
+      "id": "ansiedade_futuro",
+      "title": "Ansiedade, Preocupação e Incerteza do Amanhã",
+      "keywords": ["ansiedade", "ansioso", "preocupado", "preocupacao", "futuro", "amanha", "incerteza", "angustia", "desespero", "panico", "aflicao", "inseguro", "inseguranca", "medo"],
+      "primary_passage": {
+        "book": "Filipenses",
+        "chapter": 4,
+        "start_verse": 6,
+        "end_verse": 7,
+        "theme_title": "A Paz que Excede Todo Entendimento",
+        "context_summary": "O apóstolo Paulo escreveu esta carta da prisão, ensinando que a verdadeira paz não depende do controle das circunstâncias externas, mas de entregar as ansiedades nas mãos de Deus através da oração e da gratidão.",
+        "reflection": "Quando o peso do amanhã ameaça sufocar o seu hoje, Deus convida você a trocar o fardo da preocupação pelo alívio da oração. Deus não promete que não enfrentaremos dias difíceis, mas promete a Sua presença protetora como uma sentinela celestial guardando o seu coração e a sua mente em Cristo Jesus.",
+        "guided_prayer": "Pai celestial, coloco diante de Ti toda a ansiedade, o medo e as incertezas que pesam sobre o meu peito. Eu abro mão de tentar controlar aquilo que só pertence a Ti. Derrama sobre a minha mente a Tua paz santa, aquela que supera qualquer lógica humana, e ajuda-me a descansar na certeza de que Tu já estás no meu amanhã. Em nome de Jesus, amém.",
+        "practical_step": "Feche os olhos por 1 minuto. Respire fundo, solte os ombros e repita três vezes em voz baixa: 'O Senhor cuida de mim, hoje eu escolho a Sua paz'."
+      },
+      "alternative_passages": [
+        {"book": "Mateus", "chapter": 6, "start_verse": 25, "end_verse": 34, "note": "Não andeis inquietos pelo dia de amanhã"},
+        {"book": "1 Pedro", "chapter": 5, "start_verse": 7, "end_verse": 7, "note": "Lançando sobre ele toda a vossa ansiedade"},
+        {"book": "Salmos", "chapter": 94, "start_verse": 19, "end_verse": 19, "note": "Quando a ansiedade me dominava, o teu consolo trouxe alívio"},
+        {"book": "Isaías", "chapter": 41, "start_verse": 10, "end_verse": 10, "note": "Não temas, porque eu sou contigo"}
+      ]
+    },
+    {
+      "id": "luto_tristeza_perda",
+      "title": "Luto, Perda e Dor da Saudade",
+      "keywords": ["luto", "perdi", "perda", "morte", "morreu", "faleceu", "saudade", "tristeza", "choro", "lagrimas", "dor", "coracao partido", "pesar", "despedida", "lamentacao"],
+      "primary_passage": {
+        "book": "Salmos",
+        "chapter": 34,
+        "start_verse": 18,
+        "end_verse": 19,
+        "theme_title": "O Senhor está Perto dos de Coração Quebrantado",
+        "context_summary": "Davi compôs este salmo num momento de perigo e vulnerabilidade extrema, declarando que Deus não rejeita a nossa dor nem se afasta quando choramos, mas Se aproxima ainda mais do coração ferido.",
+        "reflection": "O luto e a dor da perda são sentimentos profundos e legítimos. Deus não exige que você finja força quando seu coração está em pedaços. Ele é o 'Pai das misericórdias e Deus de toda consolação'. Cada lágrima derramada é acolhida por Ele. Há esperança mesmo na noite mais escura da alma.",
+        "guided_prayer": "Senhor Deus, a dor da perda e da saudade aperta a minha alma e me faltam palavras. Obrigado por não Te afastares de mim quando estou frágil. Abraça o meu coração partido com o Teu consolo divino. Sustenta os meus passos quando sinto que não tenho mais forças e sê o meu refúgio seguro nesta tempestade. Em nome de Jesus, amém.",
+        "practical_step": "Não reprima as suas lágrimas hoje. Permita-se sentir o acolhimento de Deus e reserve alguns minutos para orar ou escrever uma lembrança de gratidão por quem você ama."
+      },
+      "alternative_passages": [
+        {"book": "Apocalipse", "chapter": 21, "start_verse": 4, "end_verse": 4, "note": "Ele enxugará dos seus olhos toda lágrima"},
+        {"book": "Salmos", "chapter": 23, "start_verse": 1, "end_verse": 4, "note": "Ainda que eu ande pelo vale da sombra da morte, não temerei"},
+        {"book": "2 Coríntios", "chapter": 1, "start_verse": 3, "end_verse": 4, "note": "O Deus de toda consolação"},
+        {"book": "Mateus", "chapter": 5, "start_verse": 4, "end_verse": 4, "note": "Bem-aventurados os que choram, pois serão consolados"}
+      ]
+    },
+    {
+      "id": "cansaco_esgotamento",
+      "title": "Cansaço Extremo, Esgotamento e Sobrecarga (Burnout)",
+      "keywords": ["cansado", "cansaco", "exausto", "exaustao", "esgotado", "esgotamento", "sobrecarregado", "sobrecarga", "fardo", "burnout", "sem forcas", "fraco", "desanimo", "desanimado", "pesar"],
+      "primary_passage": {
+        "book": "Mateus",
+        "chapter": 11,
+        "start_verse": 28,
+        "end_verse": 30,
+        "theme_title": "O Descanso Prometido por Jesus",
+        "context_summary": "Jesus dirigiu estas palavras a pessoas exaustas pelas cobranças religiosas e pelos fardos pesados da vida, oferecendo um jugo suave: o descanso interior que só a Sua graça pode proporcionar.",
+        "reflection": "Você não foi criado para carregar o mundo nas costas. Quando as exigências do trabalho, da família e das responsabilidades esgotarem as suas energias, Jesus faz o convite mais terno dos evangelhos: 'Venham a mim'. O descanso que Ele oferece não é mera inatividade física, mas paz profunda na alma.",
+        "guided_prayer": "Jesus, venho a Ti exatamente como estou: cansado, sobrecarregado e com as energias esgotadas. Eu entrego em Tuas mãos os fardos pesados que tenho tentado carregar sozinho. Ensina-me a andar no Teu ritmo de graça e concede descanso verdadeiro ao meu corpo, à minha mente e ao meu espírito. Amém.",
+        "practical_step": "Identifique uma tarefa não urgente que você pode adiar ou delegar hoje. Dê a si mesmo a permissão de descansar por 20 minutos sem telas nem culpas."
+      },
+      "alternative_passages": [
+        {"book": "Isaías", "chapter": 40, "start_verse": 29, "end_verse": 31, "note": "Ele fortalece o cansado e multiplica as forças"},
+        {"book": "Salmos", "chapter": 62, "start_verse": 1, "end_verse": 2, "note": "A minha alma descansa somente em Deus"},
+        {"book": "Salmos", "chapter": 127, "start_verse": 2, "end_verse": 2, "note": "Aos seus amados ele dá o sono"}
+      ]
+    },
+    {
+      "id": "solidao_abandono",
+      "title": "Solidão, Rejeição e Sensação de Abandono",
+      "keywords": ["sozinho", "solidao", "abandonado", "abandono", "rejeitado", "rejeicao", "desamparado", "ninguem se importa", "vazio", "esquecido", "incompreendido", "isolado"],
+      "primary_passage": {
+        "book": "Isaías",
+        "chapter": 49,
+        "start_verse": 15,
+        "end_verse": 16,
+        "theme_title": "Você está Gravado nas Palmas das Mãos de Deus",
+        "context_summary": "No meio do exílio e da aparente desolação do povo, Deus responde à sensação de esquecimento com uma das mais ternas analogias maternais de todas as Escrituras.",
+        "reflection": "Mesmo quando as pessoas mais próximas falham, se distanciam ou não compreendem a sua dor, o Senhor jamais Se esquece de você. Você não é um número nem um acidente; o Criador do universo gravou o seu nome nas palmas das Suas mãos. Ele está presente no silêncio do seu quarto.",
+        "guided_prayer": "Senhor meu Deus, há momentos em que a solidão dói e o silêncio parece ensurdecedor. Peço que a Tua presença real preencha todo o vazio do meu coração. Lembra-me de que nunca estou verdadeiramente desamparado, pois o Teu Espírito habita comigo. Faz-me sentir o Teu amor caloroso neste instante. Em nome de Jesus, amém.",
+        "practical_step": "Envie uma mensagem de carinho ou um 'olá' para alguém da sua família ou círculo de amizade hoje. Muitas vezes, estender a mão a outro rompe a corrente da solidão."
+      },
+      "alternative_passages": [
+        {"book": "Salmos", "chapter": 27, "start_verse": 10, "end_verse": 10, "note": "Ainda que meu pai e minha mãe me abandonem, o Senhor me acolherá"},
+        {"book": "Hebreus", "chapter": 13, "start_verse": 5, "end_verse": 5, "note": "Nunca o deixarei, nunca o abandonarei"},
+        {"book": "Salmos", "chapter": 139, "start_verse": 7, "end_verse": 10, "note": "Para onde me ausentarei do teu Espírito?"}
+      ]
+    },
+    {
+      "id": "gratidao_louvor",
+      "title": "Gratidão, Alegria e Celebração por Bênçãos",
+      "keywords": ["gratidao", "grato", "agradecer", "agradecido", "alegria", "feliz", "vitoria", "bencao", "louvor", "comemorar", "celebrar", "conquista", "milagre", "testemunho"],
+      "primary_passage": {
+        "book": "Salmos",
+        "chapter": 103,
+        "start_verse": 1,
+        "end_verse": 5,
+        "theme_title": "Bendize, ó Minha Alma, ao Senhor",
+        "context_summary": "O rei Davi convoca a sua própria alma e todo o seu ser interior a lembrar e celebrar cada benefício, perdão, cura e misericórdia concedidos por Deus ao longo da vida.",
+        "reflection": "A gratidão é o oxigênio da fé. Quando celebramos as bênçãos recebidas, nosso olhar se alinha com a bondade generosa do Pai celestial. Lembrar dos Seus feitos passados enche o presente de alegria e nos dá firmeza inabalável para o amanhã.",
+        "guided_prayer": "Senhor Deus, meu coração transborda de gratidão por Tua fidelidade e por cada livramento, vitória e bênção que derramaste sobre a minha vida! Eu Te louvo não apenas pelo que fazes, mas por quem Tu és: bom, gracioso e misericordioso. Que a minha boca viva sempre para celebrar as Tuas maravilhas. Amém!",
+        "practical_step": "Escreva num papel três motivos concretos pelos quais você é grato a Deus hoje e compartilhe essa alegria com alguém especial."
+      },
+      "alternative_passages": [
+        {"book": "1 Tessalonicenses", "chapter": 5, "start_verse": 16, "end_verse": 18, "note": "Alegrem-se sempre, orem continuamente, dêem graças em todas as circunstâncias"},
+        {"book": "Salmos", "chapter": 100, "start_verse": 1, "end_verse": 5, "note": "Celebrem com júbilo ao Senhor todos os moradores da terra"},
+        {"book": "Salmos", "chapter": 118, "start_verse": 24, "end_verse": 24, "note": "Este é o dia que fez o Senhor; regozijemo-nos nele"}
+      ]
+    },
+    {
+      "id": "perdao_magoa",
+      "title": "Perdão, Mágoa, Traição e Ressentimento",
+      "keywords": ["perdao", "perdoar", "magoa", "ressentimento", "traicao", "traido", "raiva", "rancor", "odio", "ofensa", "ofendido", "injustica", "amargura", "vinganca"],
+      "primary_passage": {
+        "book": "Efésios",
+        "chapter": 4,
+        "start_verse": 31,
+        "end_verse": 32,
+        "theme_title": "O Poder Libertador do Perdão",
+        "context_summary": "Paulo exorta os crentes a abandonarem o veneno da amargura e a praticarem o perdão generoso, tendo como modelo e fonte o próprio perdão que recebemos gratuitamente em Cristo.",
+        "reflection": "Perdoar não significa concordar com o erro alheio nem fingir que a ofensa não doeu. Perdoar é abrir a cela do prisioneiro e descobrir que o prisioneiro libertado era você mesmo. A amargura é um fardo que adoece o corpo e a alma; o perdão restaura a leveza e a paz do espírito.",
+        "guided_prayer": "Pai misericordioso, Tu conheces as feridas e as palavras que me machucaram profundamente. Reconheço que guardar ressentimento só me aprisiona. Peço que a Tua graça me capacite a perdoar de verdade, assim como fui perdoado por Ti na cruz. Cura as lembranças amargas do meu coração e liberta-me para viver em paz e em amor. Em nome de Jesus, amém.",
+        "practical_step": "Em oração sincera, diga o nome da pessoa que o magoou e declare diante de Deus: 'Eu escolho liberar o perdão e entrego a justiça nas mãos do Senhor'."
+      },
+      "alternative_passages": [
+        {"book": "Colossenses", "chapter": 3, "start_verse": 12, "end_verse": 14, "note": "Perdoem como o Senhor lhes perdoou"},
+        {"book": "Mateus", "chapter": 6, "start_verse": 14, "end_verse": 15, "note": "Se perdoarem aos homens as suas ofensas, o vosso Pai também vos perdoará"},
+        {"book": "Provérbios", "chapter": 19, "start_verse": 11, "end_verse": 11, "note": "A sabedoria do homem lhe dá paciência; sua glória é relevar uma ofensa"}
+      ]
+    },
+    {
+      "id": "culpa_arrependimento",
+      "title": "Culpa, Falhas, Pecado e Busca por Restauração",
+      "keywords": ["culpa", "culpado", "falhei", "pequei", "pecado", "vergonha", "arrependimento", "arrependido", "remorso", "errei", "indigno", "misericordia", "segunda chance"],
+      "primary_passage": {
+        "book": "1 João",
+        "chapter": 1,
+        "start_verse": 8,
+        "end_verse": 9,
+        "theme_title": "Fiel e Justo para nos Perdoar e Purificar",
+        "context_summary": "O apóstolo João combate tanto a hipocrisia de fingir que não pecamos quanto o desespero da culpa paralisante, revelando a suficiência absoluta do perdão de Cristo.",
+        "reflection": "O acusador quer que você acredite que os seus erros são maiores do que a graça de Deus. Mas a Palavra declara que onde abundou o pecado, superabundou a graça. Quando nos achegamos com sinceridade a Deus, Ele não nos recebe com pedras nas mãos, mas com os braços abertos do Pai da parábola do Filho Pródigo.",
+        "guided_prayer": "Senhor, venho a Ti com o coração humilde reconhecendo as minhas falhas, fraquezas e pecados. Peço perdão por tudo aquilo em que Te entristeci por palavras, pensamentos ou ações. Lava a minha alma com o sangue precioso de Jesus e quebra todo o peso da condenação. Concede-me um novo recomeço na Tua retidão. Amém.",
+        "practical_step": "Lembre-se: 'Nenhuma condenação há para os que estão em Cristo Jesus' (Romanos 8:1). Levante a cabeça e dê hoje um passo prático em obediência e gratidão."
+      },
+      "alternative_passages": [
+        {"book": "Romanos", "chapter": 8, "start_verse": 1, "end_verse": 2, "note": "Nenhuma condenação há para os que estão em Cristo Jesus"},
+        {"book": "Salmos", "chapter": 103, "start_verse": 11, "end_verse": 13, "note": "Tão longe quanto o oriente está do ocidente, assim afasta de nós as nossas transgressões"},
+        {"book": "Miquéias", "chapter": 7, "start_verse": 18, "end_verse": 19, "note": "Ele tornará a ter compaixão de nós e lançará os nossos pecados nas profundezas do mar"}
+      ]
+    },
+    {
+      "id": "sabedoria_direcao",
+      "title": "Busca por Sabedoria, Tomada de Decisão e Direção",
+      "keywords": ["duvida", "duvidas", "decisao", "decidir", "direcao", "escolha", "escolhas", "sabedoria", "confuso", "confusao", "qual caminho", "orientacao", "conselho", "discernimento"],
+      "primary_passage": {
+        "book": "Provérbios",
+        "chapter": 3,
+        "start_verse": 5,
+        "end_verse": 6,
+        "theme_title": "Confiança no Senhor e Caminhos Aplainados",
+        "context_summary": "Instrução paternal de sabedoria que ensina que o segredo das decisões certas não é o excesso de autoconfiança humana, mas a dependência e a consagração diária a Deus.",
+        "reflection": "Em momentos de encruzilhada, quando não sabemos qual rumo tomar, Deus não nos chama a adivinhar o futuro por conta própria. Ele nos convida a confiar de todo o coração e a submeter cada plano aos Seus pés. Ele mesmo promete aplainar e direcionar as nossas veredas.",
+        "guided_prayer": "Senhor meu Deus, coloco diante de Ti as escolhas e decisões que preciso tomar nos próximos dias. Renuncio à autossuficiência do meu próprio entendimento e peço a Tua sabedoria celeste, que é pura, pacífica e cheia de discernimento. Alinha os meus passos à Tua santa vontade e ilumina o caminho pelo qual devo seguir. Em nome de Jesus, amém.",
+        "practical_step": "Antes de tomar a sua decisão, faça uma pausa para orar e pergunte a si mesmo: 'Qual dessas opções me aproxima mais da paz de Deus e do amor ao próximo?'"
+      },
+      "alternative_passages": [
+        {"book": "Tiago", "chapter": 1, "start_verse": 5, "end_verse": 6, "note": "Se algum de vocês tem falta de sabedoria, peça-a a Deus"},
+        {"book": "Salmos", "chapter": 119, "start_verse": 105, "end_verse": 105, "note": "Lâmpada para os meus pés é a tua palavra e luz para o meu caminho"},
+        {"book": "Isaías", "chapter": 30, "start_verse": 21, "end_verse": 21, "note": "Os seus ouvidos ouvirão uma palavra atrás de você: Este é o caminho, andem nele"}
+      ]
+    },
+    {
+      "id": "enfermidade_cura",
+      "title": "Enfermidade, Doença, Dor Física e Esperança de Cura",
+      "keywords": ["doente", "doenca", "enfermidade", "enfermo", "dor", "hospital", "diagnostico", "saude", "cura", "remedio", "cirurgia", "medico", "fraqueza fisica"],
+      "primary_passage": {
+        "book": "Jeremias",
+        "chapter": 17,
+        "start_verse": 14,
+        "end_verse": 14,
+        "theme_title": "Cura-me, Senhor, e Serei Curado",
+        "context_summary": "O profeta Jeremias faz uma oração de dependência total, reconhecendo que acima de todos os recursos humanos está a soberania e a graça restauradora de Deus.",
+        "reflection": "A doença fragiliza o corpo e tenta abater o ânimo, mas o poder de Deus não tem limites. O Senhor Jesus andou entre as pessoas curando toda sorte de males e consolando os aflitos. Ele é o Médico dos médicos. Enquanto você cuida da saúde e segue as orientações médicas, coloque a sua esperança no Deus que renova as suas forças dia após dia.",
+        "guided_prayer": "Pai amado, trago a Ti o meu corpo, a minha saúde e este momento de enfermidade e dor. Tu és o Deus que sara e que restaura. Abençoa os médicos e os tratamentos, e toca com as Tuas mãos compassivas cada célula e órgão afetado. Renova a minha vitalidade e enche meu espírito de paciência, paz e esperança. Em nome de Jesus, amém.",
+        "practical_step": "Beba um copo de água com calma, agradeça pela vida e declare sobre o seu corpo a paz e a proteção do Senhor."
+      },
+      "alternative_passages": [
+        {"book": "Salmos", "chapter": 103, "start_verse": 2, "end_verse": 3, "note": "Ele perdoa todos os seus pecados e cura todas as suas doenças"},
+        {"book": "Tiago", "chapter": 5, "start_verse": 14, "end_verse": 15, "note": "A oração da fé salvará o doente, e o Senhor o levantará"},
+        {"book": "Isaías", "chapter": 53, "start_verse": 4, "end_verse": 5, "note": "Pelas suas feridas fomos curados"}
+      ]
+    },
+    {
+      "id": "financeiro_provisao",
+      "title": "Dificuldades Financeiras, Dívidas e Busca por Provisão",
+      "keywords": ["dinheiro", "financeiro", "divida", "dividas", "desemprego", "desempregado", "contas", "falta", "escassez", "provisao", "trabalho", "sustento", "crise financeira"],
+      "primary_passage": {
+        "book": "Filipenses",
+        "chapter": 4,
+        "start_verse": 19,
+        "end_verse": 19,
+        "theme_title": "Deus Suprirá Todas as Vossas Necessidades",
+        "context_summary": "Paulo agradece a oferta generosa dos filipenses e lhes garante que o Deus Todo-Poderoso, dono de todas as riquezas em glória, cuidará de suprir cada necessidade da vida deles.",
+        "reflection": "As contas apertadas e a incerteza do sustento podem trazer noites insones, mas o seu Provedor é fiel. O mesmo Deus que veste os lírios do campo e alimenta as aves do céu conhece exatamente aquilo de que você precisa para sobreviver e honrar seus compromissos. Ele não Se esqueceu da sua casa.",
+        "guided_prayer": "Senhor Deus Jeová Jireh, o Deus da Provisão, apresento a Ti a minha vida financeira, as contas a pagar e as necessidades da minha família. Dá-me sabedoria para administrar os meus recursos, abre portas de trabalho e oportunidade onde hoje parecem haver apenas muros, e supre tudo o que nos falta segundo as Tuas gloriosas riquezas. Em nome de Jesus, amém.",
+        "practical_step": "Faça uma lista honesta das prioridades financeiras de hoje, entregue cada item em oração e dê um passo de diligência buscando novas oportunidades ou renegociando o que for necessário."
+      },
+      "alternative_passages": [
+        {"book": "Mateus", "chapter": 6, "start_verse": 31, "end_verse": 33, "note": "Buscai primeiro o Reino de Deus e a sua justiça, e todas estas coisas vos serão acrescentadas"},
+        {"book": "Salmos", "chapter": 37, "start_verse": 25, "end_verse": 25, "note": "Fui jovem e já sou velho, mas nunca vi desamparado o justo"},
+        {"book": "Malaquias", "chapter": 3, "start_verse": 10, "end_verse": 10, "note": "Abrirei as janelas do céu e derramarei bênção sem medida"}
+      ]
+    },
+    {
+      "id": "fe_esperanca_desanimo",
+      "title": "Crise de Fé, Desânimo Espiritual e Vontade de Desistir",
+      "keywords": ["desanimo", "desistir", "vontade de desistir", "sem fe", "crise de fe", "duvidando", "deus nao me ouve", "deus me esqueceu", "frio", "vazio espiritual", "esgotado espiritualmente"],
+      "primary_passage": {
+        "book": "Isaías",
+        "chapter": 40,
+        "start_verse": 28,
+        "end_verse": 31,
+        "theme_title": "Os que Esperam no Senhor Renovam as Forças",
+        "context_summary": "O profeta Isaías lembra o povo da grandeza inesgotável do Criador, prometendo que aqueles cuja confiança está fincada em Deus receberão asas como águias para voar acima da tempestade.",
+        "reflection": "Sentir a fé vacilar em meio ao cansaço ou às demoras da vida não faz de você um fracasso; faz de você humano. O segredo da renovação espiritual não está na força da nossa própria vontade, mas em esperar e repousar na fidelidade daquele que nunca se cansa nem dorme. Ele renovará suas forças hoje.",
+        "guided_prayer": "Senhor, quando as minhas forças se esvaem e a minha fé parece tão pequena quanto um grão de mostarda, segura a minha mão. Eu creio, mas ajuda-me na minha incredulidade. Sopra de novo o Teu Espírito Santo sobre a minha vida, reacende a chama da esperança e dá-me vigor para continuar a caminhada, passo a passo. Em nome de Jesus, amém.",
+        "practical_step": "Não exija de si mesmo um salto gigante hoje. Dê apenas o próximo pequeno passo de obediência e coloque uma canção de adoração ou louvor para ouvir durante o dia."
+      },
+      "alternative_passages": [
+        {"book": "Gálatas", "chapter": 6, "start_verse": 9, "end_verse": 9, "note": "Não nos cansemos de fazer o bem, pois no tempo certo colheremos"},
+        {"book": "Hebreus", "chapter": 11, "start_verse": 1, "end_verse": 1, "note": "A fé é a certeza daquilo que esperamos e a prova das coisas que não vemos"},
+        {"book": "Salmos", "chapter": 42, "start_verse": 11, "end_verse": 11, "note": "Por que você está assim tão triste, ó minha alma? Ponha a sua esperança em Deus"}
+      ]
+    }
+  ]
+}

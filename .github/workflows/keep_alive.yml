@@ -1,0 +1,24 @@
+name: Keep App Alive (Auto-Wake)
+
+on:
+  schedule:
+    # Executa a cada 6 horas para prevenir hibernação do Streamlit Cloud
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # Permite disparar manualmente pelo GitHub Actions
+
+jobs:
+  ping:
+    name: Wake Streamlit App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Streamlit App URL
+        run: |
+          # Substitua pela URL do seu app após o deploy no Streamlit Cloud
+          APP_URL="${{ secrets.STREAMLIT_APP_URL }}"
+          if [ -n "$APP_URL" ]; then
+            echo "Pinging $APP_URL..."
+            curl -s -L --max-time 30 "$APP_URL" > /dev/null || true
+            echo "Ping realizado com sucesso!"
+          else
+            echo "Segredo STREAMLIT_APP_URL ainda não configurado. Pule este passo."
+          fi

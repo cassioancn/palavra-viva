@@ -1,0 +1,21 @@
+# Ambientes Virtuais
+venv/
+.venv/
+env/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Variáveis de ambiente & Segredos
+.env
+.env.local
+.streamlit/secrets.toml
+
+# Banco de dados gerado em runtime (auto-gerado em 2s a partir de pt_nvi.json e pt_aa.json)
+data/bible.db
+
+# Logs & temporários
+*.log
+.DS_Store
