@@ -1,14 +1,15 @@
 "use client";
 
 import React from "react";
-import { SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal, Heart } from "lucide-react";
 
 interface HeaderProps {
   version: "nvi" | "aa";
   onOpenSettings: () => void;
+  onOpenPix: () => void;
 }
 
-export function Header({ version, onOpenSettings }: HeaderProps) {
+export function Header({ version, onOpenSettings, onOpenPix }: HeaderProps) {
   return (
     <header className="w-full border-b border-sanctuary-700/60 bg-sanctuary-900/60 backdrop-blur-md sticky top-0 z-30 transition-all">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
@@ -34,6 +35,17 @@ export function Header({ version, onOpenSettings }: HeaderProps) {
 
         {/* Action Controls */}
         <div className="flex items-center gap-2">
+          {/* Botão de Apoio via Pix */}
+          <button
+            onClick={onOpenPix}
+            className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-rose-300 hover:text-white bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 px-3 py-1.5 rounded-lg transition-all"
+            title="Apoiar este projeto com Pix"
+          >
+            <Heart className="w-3.5 h-3.5 fill-rose-400 text-rose-400" />
+            <span className="hidden sm:inline">Apoiar Projeto</span>
+          </button>
+
+          {/* Seletor de Versão */}
           <button
             onClick={onOpenSettings}
             className="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-300 hover:text-sacred-300 bg-sanctuary-800 hover:bg-sanctuary-700/80 border border-sanctuary-600 px-3 py-1.5 rounded-lg transition-colors shadow-sm"

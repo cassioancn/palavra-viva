@@ -7,8 +7,11 @@ import { VerseCard } from "@/components/VerseCard";
 import { DevotionalTabs } from "@/components/DevotionalTabs";
 import { ChapterModal } from "@/components/ChapterModal";
 import { SettingsModal } from "@/components/SettingsModal";
+import { PixDonationModal } from "@/components/PixDonationModal";
+import { RecommendedBooks } from "@/components/RecommendedBooks";
+import { AdBanner } from "@/components/AdBanner";
 import { Footer } from "@/components/Footer";
-import { Sparkles, Send, Loader2, RotateCcw, AlertCircle } from "lucide-react";
+import { Sparkles, Send, Loader2, RotateCcw, AlertCircle, Heart } from "lucide-react";
 
 export default function HomePage() {
   const [feeling, setFeeling] = useState("");
@@ -18,6 +21,7 @@ export default function HomePage() {
   const [result, setResult] = useState<any | null>(null);
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isPixOpen, setIsPixOpen] = useState(false);
   const [chapterModal, setChapterModal] = useState<{
     isOpen: boolean;
     book: string;
@@ -106,6 +110,7 @@ export default function HomePage() {
       <Header
         version={version}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenPix={() => setIsPixOpen(true)}
       />
 
       <main className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-12 flex flex-col gap-8">
@@ -185,6 +190,9 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* AdSense Top Slot (se configurado) */}
+        <AdBanner slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_TOP} />
+
         {/* Result Area */}
         <div ref={resultRef}>
           {result && result.passage && (
@@ -207,6 +215,31 @@ export default function HomePage() {
                 practicalStep={result.practicalStep}
                 alternativePassages={result.alternativePassages}
               />
+
+              {/* Bloco de Monetização 1: Recomendações de Bíblias & Livros na Amazon */}
+              <RecommendedBooks themeId={result.themeId} />
+
+              {/* Bloco de Apoio Missionário via Pix */}
+              <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-sacred-500/10 via-sanctuary-900 to-sanctuary-900 border border-sacred-500/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="space-y-1 text-center sm:text-left">
+                  <h4 className="font-cinzel font-bold text-sacred-300 text-sm sm:text-base flex items-center justify-center sm:justify-start gap-1.5">
+                    <Heart className="w-4 h-4 fill-rose-400 text-rose-400" />
+                    <span>Esta palavra abençoou o seu dia?</span>
+                  </h4>
+                  <p className="text-xs text-slate-400 max-w-md leading-relaxed">
+                    Ajude-nos a manter este projeto no ar com qualquer contribuição voluntária via Pix.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsPixOpen(true)}
+                  className="shrink-0 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-gradient-to-r from-sacred-500 to-sacred-600 hover:from-sacred-400 hover:to-sacred-500 text-sanctuary-950 shadow-glow transition-all active:scale-95"
+                >
+                  Apoiar com Pix ❤️
+                </button>
+              </div>
+
+              {/* AdSense Bottom Slot (se configurado) */}
+              <AdBanner slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_BOTTOM} />
             </div>
           )}
         </div>
@@ -230,6 +263,11 @@ export default function HomePage() {
         version={version}
         onSave={handleSaveSettings}
         onClose={() => setIsSettingsOpen(false)}
+      />
+
+      <PixDonationModal
+        isOpen={isPixOpen}
+        onClose={() => setIsPixOpen(false)}
       />
     </>
   );

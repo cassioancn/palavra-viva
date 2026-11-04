@@ -1,6 +1,6 @@
 # 🕊️ Palavra Viva — Consolo & Direção na Bíblia Sagrada
 
-> **Site moderno desenvolvido em Next.js 14, React e Tailwind CSS, otimizado para deploy gratuito na Vercel ou Cloudflare, com Inteligência Artificial e 100% livre de alucinações bíblicas.**
+> **Site moderno desenvolvido em Next.js 14, React e Tailwind CSS, otimizado para deploy gratuito no Cloudflare Pages, com Inteligência Artificial, motor anti-alucinação bíblica e canais de monetização integrados.**
 
 ---
 
@@ -13,9 +13,35 @@ O **Palavra Viva** é um site leve, sereno e responsivo (mobile-first) onde o us
 - 📜 **Contexto Bíblico Original:** 1 a 2 frases para compreender o sentido fiel do texto histórico.
 - 🙏 **Oração Pessoal Conduzida:** Uma prece sincera e íntima em primeira pessoa para o usuário orar.
 - 💡 **Passo Prático de Fé:** Uma atitude simples e reconfortante para o dia.
-- 🔊 **Áudio Narrado:** Voz natural em português via Web Speech API (zero latência e sem custo de servidores).
+- 🔊 **Áudio Narrado:** Voz natural em português via Web Speech API (zero latência e sem custo de servidores de voz).
 - 📱 **Compartilhar no WhatsApp:** Botão com mensagem pronta e formatada para enviar a amigos ou postar no Status.
-- 📖 **Leitor do Capítulo Completo:** Modal dinâmico para mergulhar em todo o contexto bíblico com destaque dourado nos versículos selecionados.
+- 📖 **Leitor do Capítulo Completo:** Modal dinâmico para ler todo o capítulo com destaque dourado nos versículos selecionados.
+
+---
+
+## 💰 Como Funciona a Monetização do Site
+
+O site já vem com **3 canais de monetização prontos** para você lucrar de forma respeitosa e ética:
+
+### 1. Doações Voluntárias via Pix ("Apoie esta Obra")
+- No cabeçalho e logo após o devocional há um botão discreto e caloroso de apoio.
+- Abre um modal com botão **"Copiar Chave Pix"** com 1 clique.
+- **Como configurar sua chave:** Configure a variável de ambiente no Cloudflare:
+  - `NEXT_PUBLIC_PIX_KEY`: Sua chave Pix (ex: seu e-mail, telefone ou chave aleatória).
+  - `NEXT_PUBLIC_PIX_NAME`: Seu nome ou nome do projeto.
+
+### 2. Programa de Associados Amazon (Comissões de até 15% em Livros e Bíblias)
+- Abaixo de cada reflexão, o site recomenda de forma contextual livros cristãos consagrados e Bíblias de Estudo (ex: se o usuário está ansioso, recomenda livros de cura da ansiedade e Bíblias de Estudo; se está em luto, recomenda livros de consolo).
+- Cada botão leva para a Amazon com a sua tag de afiliado.
+- **Como configurar sua tag:**
+  - `NEXT_PUBLIC_AMAZON_TAG`: Sua tag de associado Amazon (ex: `seunome-20`). Cadastre-se gratuitamente em [associados.amazon.com.br](https://associados.amazon.com.br).
+
+### 3. Google AdSense / Banners de Anúncios
+- O site possui posições responsivas preparadas para banners de anúncios (entre o versículo e a oração e no rodapé).
+- Ficam 100% ocultos até você configurar seu AdSense, garantindo visual perfeito sem caixas vazias.
+- **Como configurar:**
+  - `NEXT_PUBLIC_ADSENSE_CLIENT`: Seu ID de publicador (ex: `ca-pub-XXXXXXXXXXXXX`).
+  - `NEXT_PUBLIC_ADSENSE_SLOT_TOP` / `NEXT_PUBLIC_ADSENSE_SLOT_BOTTOM`: Códigos dos seus blocos de anúncios.
 
 ---
 
@@ -25,68 +51,44 @@ Ao contrário de sites que deixam IAs gerativas "recitarem" versículos de memó
 
 ```mermaid
 flowchart TD
-    A["Usuário expressa o que sente"] --> B["API Serverless /api/counsel"]
+    A["Usuário expressa o que sente"] --> B["API Edge /api/counsel (Cloudflare)"]
     B --> C["LLM Gemini analisa a dor/sentimento e indica Livro/Capítulo/Versículo"]
     C --> D["Auditoria Canônica no Backend (62.191 versículos reais)"]
     D -->|Versículo existe| E["Extração do Texto Literal Autêntico"]
     D -->|Versículo inexistente ou IA sem chave| F["Fallback para Catálogo Temático Curado"]
     F --> E
     E --> G["LLM gera Reflexão Pastoral e Oração sobre o texto verificado"]
-    G --> H["Interface Web moderna (Next.js)"]
+    G --> H["Interface Web moderna com Monetização (Pix + Amazon)"]
 ```
 
 1. **A IA NÃO inventa texto bíblico:** Ela apenas atua como conselheira e sugere o livro/capítulo canônico.
-2. **Auditoria Canônica em Tempo Real:** O backend serverless busca o texto literal na base canônica dos 66 livros da Bíblia protestante.
+2. **Auditoria Canônica em Tempo Real:** O backend busca o texto literal na base canônica dos 66 livros da Bíblia protestante.
 3. **Resguardo 100%:** Se a IA indicar qualquer referência incorreta, o validador substitui pelo tema canônico mais próximo. **Nenhum versículo falso é exibido.**
-4. **Funciona até sem chave de IA:** Mesmo sem chave do Gemini configurada, o site funciona perfeitamente utilizando o motor local de correspondência bíblica.
 
 ---
 
-## 🚀 Como Colocar no Ar Grátis na Vercel (Em 2 Minutos)
+## 🌐 Como Colocar no Ar no Cloudflare Pages (Passo a Passo)
 
-O projeto foi configurado com suporte nativo para a **Vercel**:
-
-### 1. Enviar o Código para o seu GitHub
-Abra o terminal na pasta do projeto e envie para o seu repositório:
-```bash
-git remote add origin https://github.com/SEU_USUARIO/palavra-viva.git
-git push -u origin main
-```
-
-### 2. Importar na Vercel (Gratuito)
-1. Acesse **[vercel.com](https://vercel.com/)** e faça login com sua conta do GitHub.
-2. Clique em **"Add New..."** ➔ **"Project"**.
-3. Selecione o repositório `palavra-viva`.
-4. (Opcional) Em **Environment Variables**, adicione sua chave gratuita do Gemini:
-   - `GEMINI_API_KEY`: `sua_chave_aqui`
-5. Clique em **"Deploy"**.
-6. Pronto! Em menos de 1 minuto seu site estará no ar com HTTPS gratuito em `https://palavra-viva.vercel.app`.
-
----
-
-## 🌐 Como Subir no Cloudflare Pages
-
-O projeto também pode ser publicado no **Cloudflare Pages**:
-1. No painel do Cloudflare, vá em **Workers & Pages** ➔ **Create application** ➔ **Pages**.
-2. Conecte sua conta do GitHub e selecione o repositório `palavra-viva`.
-3. Defina o Build preset como **Next.js**.
-4. Configure a variável de ambiente `GEMINI_API_KEY` (se desejar).
-5. Clique em **Save and Deploy**.
+1. Acesse o **[Painel da Cloudflare](https://dash.cloudflare.com/)**.
+2. No menu lateral esquerdo, vá em **Compute (Workers & Pages)** ➔ **Create application** ➔ selecione a aba **Pages**.
+3. Clique em **Connect to Git** e selecione o seu repositório: `palavra-viva`.
+4. Na tela de configuração de build:
+   - **Framework preset:** Selecione `Next.js`.
+   - **Build command:** `npm run build`
+   - **Build output directory:** `.next`
+5. Na seção **Environment variables (advanced)**, adicione:
+   - `GEMINI_API_KEY`: Sua chave gratuita do Google AI Studio.
+   - `NEXT_PUBLIC_PIX_KEY`: Sua chave Pix para receber doações.
+   - `NEXT_PUBLIC_PIX_NAME`: Seu nome ou nome do projeto.
+   - `NEXT_PUBLIC_AMAZON_TAG`: Sua tag de associado Amazon (ex: `seunome-20`).
+6. Clique no botão azul **Save and Deploy**. Em cerca de 1 a 2 minutos o site estará online no CDN global da Cloudflare com SSL gratuito!
 
 ---
 
 ## 💻 Como Rodar Localmente no seu Computador
 
-Requisitos: Node.js 18+ instalado.
-
 ```bash
-# 1. Acesse a pasta do projeto
-cd palavra-viva
-
-# 2. Instale as dependências (já instaladas localmente)
-npm install
-
-# 3. Inicie o servidor de desenvolvimento
+cd "c:\Users\User\Documents\Cassio\palavra-viva"
 npm run dev
 ```
 
@@ -94,44 +96,9 @@ Abra o seu navegador e acesse: **`http://localhost:3000`**.
 
 ---
 
-## 🔑 Como Obter a Chave Gratuita do Gemini (Opcional)
+## 🔑 Como Obter a Chave Gratuita do Gemini
 
 1. Acesse o **[Google AI Studio](https://aistudio.google.com/)**.
 2. Faça login com qualquer conta Google.
 3. Clique em **"Get API key"** ➔ **"Create API key"**.
-4. Você pode configurar essa chave como variável de ambiente no servidor (`GEMINI_API_KEY`) ou informá-la diretamente pelo botão de **Configurações** na interface do site (fica salva no seu navegador).
-
----
-
-## 📁 Estrutura de Pastas do Site
-
-```
-palavra-viva/
-├── src/
-│   ├── app/
-│   │   ├── api/
-│   │   │   ├── counsel/route.ts  # Endpoint serverless de aconselhamento com auditoria
-│   │   │   ├── chapter/route.ts  # Endpoint para leitura do capítulo completo
-│   │   │   └── themes/route.ts   # Endpoint de catálogo temático
-│   │   ├── globals.css           # Estilos globais e Tailwind CSS
-│   │   ├── layout.tsx            # Estrutura HTML, fontes serifadas e metadados SEO
-│   │   └── page.tsx              # Página inicial interativa
-│   ├── components/
-│   │   ├── Header.tsx            # Cabeçalho com logo, status e configurações
-│   │   ├── SentimentChips.tsx    # Pílulas rápidas de estado emocional
-│   │   ├── VerseCard.tsx         # Cartão sagrado, áudio, WhatsApp e cópia
-│   │   ├── DevotionalTabs.tsx    # Abas devocionais (Pastoral, Oração, Contexto, Ação)
-│   │   ├── ChapterModal.tsx      # Modal de leitura do capítulo bíblico completo
-│   │   ├── SettingsModal.tsx     # Modal de preferência de versão (NVI/AA) e chave IA
-│   │   └── Footer.tsx            # Rodapé sereno
-│   └── lib/
-│       └── bible.ts              # Motor canônico anti-alucinação e indexador bíblico
-├── data/
-│   ├── pt_nvi.json               # Bíblia NVI completa (66 livros canônicos)
-│   ├── pt_aa.json                # Bíblia Almeida Atualizada completa
-│   └── thematic_catalog.json     # Catálogo temático curado com orações
-├── package.json                  # Dependências e scripts Next.js
-├── tailwind.config.ts            # Cores sagradas douradas e tipografia
-├── tsconfig.json                 # Configuração TypeScript
-└── vercel.json                   # Configuração de deploy Vercel
-```
+4. Configure no Cloudflare como `GEMINI_API_KEY`.

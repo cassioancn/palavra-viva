@@ -1,5 +1,6 @@
-import fs from "fs";
-import path from "path";
+import nviRaw from "../../data/pt_nvi.json";
+import aaRaw from "../../data/pt_aa.json";
+import thematicRaw from "../../data/thematic_catalog.json";
 
 export interface VerseItem {
   verse: number;
@@ -53,10 +54,9 @@ interface BibleBook {
   chapters: string[][];
 }
 
-// Memory caches for high performance serverless execution
-let nviCache: BibleBook[] | null = null;
-let aaCache: BibleBook[] | null = null;
-let themesCache: ThemeItem[] | null = null;
+const nviData: BibleBook[] = nviRaw as BibleBook[];
+const aaData: BibleBook[] = aaRaw as BibleBook[];
+const thematicCatalog: ThemeItem[] = (thematicRaw as any).themes || [];
 
 const BOOK_ALIAS_MAP: Record<string, string> = {
   // Antigo Testamento
@@ -154,45 +154,19 @@ export function normalizeBookName(raw: string): string {
 }
 
 function loadBibleData(version: "nvi" | "aa"): BibleBook[] {
-  if (version === "nvi" && nviCache) return nviCache;
-  if (version === "aa" && aaCache) return aaCache;
-
-  const fileName = version === "nvi" ? "pt_nvi.json" : "pt_aa.json";
-  const filePath = path.join(process.cwd(), "data", fileName);
-
-  try {
-    const raw = fs.readFileSync(filePath, "utf-8");
-    const data: BibleBook[] = JSON.parse(raw);
-    if (version === "nvi") nviCache = data;
-    else aaCache = data;
-    return data;
-  } catch (err) {
-    console.error(`Failed to load Bible data for ${version}:`, err);
-    return [];
-  }
+  return version === "aa" ? aaData : nviData;
 }
 
 export function loadThematicCatalog(): ThemeItem[] {
-  if (themesCache) return themesCache;
-  const filePath = path.join(process.cwd(), "data", "thematic_catalog.json");
-  try {
-    const raw = fs.readFileSync(filePath, "utf-8");
-    const parsed = JSON.parse(raw);
-    themesCache = parsed.themes || [];
-    return themesCache || [];
-  } catch (err) {
-    console.error("Failed to load thematic catalog:", err);
-    return [];
-  }
+  return thematicCatalog;
 }
 
 export function listAllThemes(): ThemeItem[] {
-  return loadThematicCatalog();
+  return thematicCatalog;
 }
 
 export function getThemeById(themeId: string): ThemeItem | undefined {
-  const themes = loadThematicCatalog();
-  return themes.find((t) => t.id === themeId);
+  return thematicCatalog.find((t) => t.id === themeId);
 }
 
 export function matchThemeByText(userInput: string): ThemeItem | null {
@@ -200,7 +174,7 @@ export function matchThemeByText(userInput: string): ThemeItem | null {
 
   const cleanText = stripAccents(userInput);
   const words = new Set(cleanText.split(/\s+/));
-  const themes = loadThematicCatalog();
+  const themes = thematicCatalog;
 
   let bestScore = 0;
   let bestTheme: ThemeItem | null = null;

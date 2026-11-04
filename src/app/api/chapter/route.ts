@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getFullChapter } from "@/lib/bible";
 
+export const runtime = "edge";
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const book = searchParams.get("book");
