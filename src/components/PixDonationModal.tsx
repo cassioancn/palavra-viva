@@ -14,7 +14,7 @@ export function PixDonationModal({ isOpen, onClose }: PixDonationModalProps) {
   if (!isOpen) return null;
 
   const pixKey =
-    process.env.NEXT_PUBLIC_PIX_KEY || "seu-pix-aqui@exemplo.com";
+    process.env.NEXT_PUBLIC_PIX_KEY || "f84f3560-de18-4c7a-b571-622465e50011";
   const pixRecipient =
     process.env.NEXT_PUBLIC_PIX_NAME || "Projeto Palavra Viva";
 
