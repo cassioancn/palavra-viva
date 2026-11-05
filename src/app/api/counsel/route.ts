@@ -7,8 +7,6 @@ import {
   getRandomComfortVerse,
 } from "@/lib/bible";
 
-export const runtime = "edge";
-
 interface RequestBody {
   feeling: string;
   version?: "nvi" | "aa";

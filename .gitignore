@@ -19,3 +19,9 @@
 *.log
 .DS_Store
 next-env.d.ts
+
+# cloudflare & opennext
+.open-next/
+.wrangler/
+cloudflare-env.d.ts
+

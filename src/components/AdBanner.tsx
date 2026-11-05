@@ -40,3 +40,4 @@ export function AdBanner({ slot, format = "auto", className = "" }: AdBannerProp
     </div>
   );
 }
+

@@ -97,3 +97,4 @@ export function PixDonationModal({ isOpen, onClose }: PixDonationModalProps) {
     </div>
   );
 }
+
