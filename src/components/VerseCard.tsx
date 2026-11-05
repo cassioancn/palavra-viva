@@ -10,7 +10,9 @@ import {
   BookOpen,
   ShieldCheck,
   Sparkles,
+  Instagram,
 } from "lucide-react";
+import { InstagramStoryModal } from "./InstagramStoryModal";
 
 interface VerseCardProps {
   reference: string;
@@ -36,6 +38,7 @@ export function VerseCard({
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [copied, setCopied] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
+  const [isInstagramOpen, setIsInstagramOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
@@ -193,12 +196,32 @@ export function VerseCard({
           <button
             onClick={handleShareWhatsApp}
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-[#25D366]/90 hover:bg-[#25D366] text-white shadow-sm transition-all hover:scale-105 active:scale-95"
+            title="Compartilhar no WhatsApp"
           >
             <Share2 className="w-4 h-4" />
             <span>WhatsApp</span>
           </button>
+
+          <button
+            onClick={() => setIsInstagramOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] hover:opacity-95 text-white shadow-sm transition-all hover:scale-105 active:scale-95"
+            title="Compartilhar no Instagram & Stories"
+          >
+            <Instagram className="w-4 h-4" />
+            <span>Instagram</span>
+          </button>
         </div>
       </div>
+
+      {/* Instagram Story Modal */}
+      <InstagramStoryModal
+        isOpen={isInstagramOpen}
+        onClose={() => setIsInstagramOpen(false)}
+        reference={reference}
+        version={version}
+        text={fullText}
+        themeTitle={themeTitle}
+      />
     </div>
   );
 }
