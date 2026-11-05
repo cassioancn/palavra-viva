@@ -11,10 +11,20 @@ import { PixDonationModal } from "@/components/PixDonationModal";
 import { RecommendedBooks } from "@/components/RecommendedBooks";
 import { AdBanner } from "@/components/AdBanner";
 import { Footer } from "@/components/Footer";
-import { Sparkles, Send, Loader2, RotateCcw, AlertCircle, Heart } from "lucide-react";
+import {
+  Sparkles,
+  Send,
+  Loader2,
+  RotateCcw,
+  AlertCircle,
+  Heart,
+  BookOpen,
+  Search,
+} from "lucide-react";
 
 export default function HomePage() {
   const [feeling, setFeeling] = useState("");
+  const [searchMode, setSearchMode] = useState<"counsel" | "search">("counsel");
   const [version, setVersion] = useState<"nvi" | "aa">("nvi");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -114,25 +124,69 @@ export default function HomePage() {
       />
 
       <main className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-12 flex flex-col gap-8">
+        {/* Mode Switcher Tabs */}
+        <div className="flex items-center justify-center">
+          <div className="inline-flex p-1 rounded-2xl bg-sanctuary-900 border border-sanctuary-700/80 shadow-inner">
+            <button
+              onClick={() => {
+                setSearchMode("counsel");
+                setErrorMsg(null);
+              }}
+              className={`flex items-center gap-2 px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                searchMode === "counsel"
+                  ? "bg-gradient-to-r from-sacred-500 to-sacred-600 text-sanctuary-950 shadow-glow"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              <Heart className="w-4 h-4" />
+              <span>Consolo & Oração</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setSearchMode("search");
+                setErrorMsg(null);
+              }}
+              className={`flex items-center gap-2 px-4 sm:px-6 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                searchMode === "search"
+                  ? "bg-gradient-to-r from-sacred-500 to-sacred-600 text-sanctuary-950 shadow-glow"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              <Search className="w-4 h-4" />
+              <span>Encontrar Passagem na Bíblia</span>
+            </button>
+          </div>
+        </div>
+
         {/* Hero Section */}
         <div className="text-center space-y-3">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sacred-500/10 text-sacred-300 border border-sacred-500/20">
             <Sparkles className="w-3.5 h-3.5 text-sacred-400" />
-            Consolo Autêntico • 100% Livre de Alucinações
+            {searchMode === "search"
+              ? "Localizador de Narrativas e Versículos Bíblicos"
+              : "Consolo Autêntico • 100% Livre de Alucinações"}
           </div>
 
           <h1 className="font-cinzel text-3xl sm:text-5xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-sacred-200 via-sacred-400 to-sacred-200">
-            A Palavra que o seu Coração Precisa
+            {searchMode === "search"
+              ? "Encontre Qualquer Passagem na Bíblia"
+              : "A Palavra que o seu Coração Precisa"}
           </h1>
 
           <p className="text-sm sm:text-base text-slate-400 max-w-xl mx-auto leading-relaxed">
-            Diga como você se sente ou o que aflige sua alma. O Palavra Viva busca
-            a passagem canônica exata das Escrituras e traz uma oração e reflexão de paz.
+            {searchMode === "search"
+              ? "Descreva uma história, cena, personagem, milagre, parábola ou tema que você procura e receba a passagem canônica exata das Escrituras com explicação rica."
+              : "Diga como você se sente ou o que aflige sua alma. O Palavra Viva busca a passagem canônica exata das Escrituras e traz uma oração e reflexão de paz."}
           </p>
         </div>
 
-        {/* Sentiment Chips */}
-        <SentimentChips onSelectSentiment={handleChipSelect} isLoading={isLoading} />
+        {/* Sentiment or Story Chips */}
+        <SentimentChips
+          mode={searchMode}
+          onSelectSentiment={handleChipSelect}
+          isLoading={isLoading}
+        />
 
         {/* Input Card */}
         <div className="w-full rounded-2xl bg-sanctuary-900 border border-sanctuary-700/80 p-5 sm:p-6 shadow-xl space-y-4">
@@ -140,7 +194,11 @@ export default function HomePage() {
             <textarea
               value={feeling}
               onChange={(e) => setFeeling(e.target.value)}
-              placeholder="Ou abra o seu coração livremente com suas próprias palavras... (Ex: Estou com muito medo de falhar no trabalho e não consigo dormir...)"
+              placeholder={
+                searchMode === "search"
+                  ? "Descreva o que você procura na Bíblia... (Ex: Davi e Golias, A multiplicação dos pães e peixes, Parábola do Filho Pródigo, A criação do mundo, Onde fala sobre a armadura de Deus, João 3:16...)"
+                  : "Ou abra o seu coração livremente com suas próprias palavras... (Ex: Estou com muito medo de falhar no trabalho e não consigo dormir...)"
+              }
               rows={4}
               disabled={isLoading}
               className="w-full resize-none rounded-xl bg-sanctuary-950/80 border border-sanctuary-700 focus:border-sacred-400 focus:ring-1 focus:ring-sacred-400 p-4 text-sm sm:text-base text-slate-100 placeholder:text-slate-500 outline-none transition-all leading-relaxed"
@@ -178,12 +236,25 @@ export default function HomePage() {
               {isLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Buscando na Palavra...</span>
+                  <span>
+                    {searchMode === "search"
+                      ? "Localizando nas Escrituras..."
+                      : "Buscando na Palavra..."}
+                  </span>
                 </>
               ) : (
                 <>
-                  <Send className="w-4 h-4" />
-                  <span>Buscar Palavra no Altar</span>
+                  {searchMode === "search" ? (
+                    <>
+                      <Search className="w-4 h-4" />
+                      <span>Localizar Passagem Bíblica</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      <span>Buscar Palavra no Altar</span>
+                    </>
+                  )}
                 </>
               )}
             </button>
