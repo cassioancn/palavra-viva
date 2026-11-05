@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://palavra-viva.novo-dia.workers.dev"),
+  alternates: {
+    canonical: "/",
+  },
   title: "Palavra Viva — Consolo & Direção na Bíblia Sagrada",
   description:
     "Compartilhe o que você está sentindo e receba uma passagem real da Bíblia Sagrada com reflexão pastoral e oração, 100% livre de alucinações.",
@@ -21,7 +25,7 @@ export const metadata: Metadata = {
     title: "Palavra Viva — Consolo & Direção na Bíblia Sagrada",
     description:
       "Diga como você se sente e encontre paz na Palavra de Deus com versículos 100% verificados e reflexões pastorais acolhedoras.",
-    url: "https://palavra-viva.vercel.app",
+    url: "https://palavra-viva.novo-dia.workers.dev",
     siteName: "Palavra Viva",
     locale: "pt_BR",
     type: "website",

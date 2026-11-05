@@ -92,7 +92,7 @@ export function VerseCard({
   };
 
   const handleShareWhatsApp = () => {
-    const message = `🕊️ *Palavra Viva para o seu coração*\n\n"${fullText}"\n\n📖 *${reference} (${version})*\n_${themeTitle}_\n\nEnviado através do Palavra Viva ✨`;
+    const message = `🕊️ *Palavra Viva para o seu coração*\n\n"${fullText}"\n\n📖 *${reference} (${version})*\n_${themeTitle}_\n\nEncontre consolo na Palavra de Deus:\nhttps://palavra-viva.novo-dia.workers.dev`;
     const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(
       message
     )}`;
