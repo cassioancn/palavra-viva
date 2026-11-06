@@ -1,14 +1,25 @@
 "use client";
 
 import React, { useState } from "react";
-import { HeartHandshake, Sparkles, BookMarked, Compass, MessageCircleHeart } from "lucide-react";
+import {
+  HeartHandshake,
+  Sparkles,
+  BookMarked,
+  Compass,
+  MessageCircleHeart,
+  RefreshCw,
+  ArrowRight,
+  BookOpen,
+} from "lucide-react";
 
-interface AlternativePassage {
+export interface AlternativePassage {
   reference: string;
   note: string;
   fullText: string;
   book: string;
   chapter: number;
+  startVerse?: number;
+  endVerse?: number;
 }
 
 interface DevotionalTabsProps {
@@ -17,7 +28,9 @@ interface DevotionalTabsProps {
   guidedPrayer: string;
   practicalStep: string;
   alternativePassages?: AlternativePassage[];
-  onSelectAlternative?: (book: string, chapter: number) => void;
+  onSelectAlternative?: (alt: AlternativePassage) => void;
+  onFetchMorePassages?: () => void;
+  isLoadingMore?: boolean;
 }
 
 export function DevotionalTabs({
@@ -27,6 +40,8 @@ export function DevotionalTabs({
   practicalStep,
   alternativePassages = [],
   onSelectAlternative,
+  onFetchMorePassages,
+  isLoadingMore = false,
 }: DevotionalTabsProps) {
   const [activeTab, setActiveTab] = useState<"reflection" | "prayer" | "context" | "action">("reflection");
 
@@ -117,28 +132,62 @@ export function DevotionalTabs({
 
       {/* Alternative Passages Footer (if any) */}
       {alternativePassages.length > 0 && (
-        <div className="border-t border-sanctuary-700/60 bg-sanctuary-950/50 p-6">
-          <div className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
-            Outras Passagens Bíblicas que Falam a Essa Situação:
+        <div className="border-t border-sanctuary-700/60 bg-sanctuary-950/60 p-5 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <div>
+              <div className="text-xs font-bold uppercase tracking-wider text-sacred-300 flex items-center gap-1.5">
+                <BookOpen className="w-3.5 h-3.5 text-sacred-400" />
+                <span>Outras Passagens Bíblicas que Falam a Essa Situação:</span>
+              </div>
+              <p className="text-[11px] text-slate-400 mt-0.5">
+                Clique em qualquer passagem para selecioná-la e ler a reflexão completa
+              </p>
+            </div>
+
+            {onFetchMorePassages && (
+              <button
+                type="button"
+                onClick={onFetchMorePassages}
+                disabled={isLoadingMore}
+                className="self-start sm:self-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-sacred-300 hover:text-white bg-sanctuary-800 hover:bg-sanctuary-700 border border-sanctuary-700 hover:border-sacred-500/40 transition-all disabled:opacity-50 active:scale-95 shadow-sm"
+                title="Buscar outros versículos inéditos para este mesmo tema sem repetições"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isLoadingMore ? "animate-spin text-sacred-400" : ""}`} />
+                <span>{isLoadingMore ? "Buscando novas passagens..." : "Buscar outras passagens"}</span>
+              </button>
+            )}
           </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             {alternativePassages.map((alt, i) => (
-              <div
+              <button
                 key={i}
-                className="p-3.5 rounded-xl bg-sanctuary-800/60 border border-sanctuary-700 hover:border-sacred-500/30 transition-all text-xs"
+                type="button"
+                onClick={() => onSelectAlternative?.(alt)}
+                className="group w-full text-left p-4 rounded-xl bg-sanctuary-800/60 hover:bg-sanctuary-800/90 border border-sanctuary-700 hover:border-sacred-400/70 transition-all text-xs cursor-pointer shadow-sm hover:shadow-glow flex flex-col justify-between active:scale-[0.98]"
               >
-                <div className="font-cinzel font-bold text-sacred-300 mb-1">
-                  📖 {alt.reference}
-                </div>
-                {alt.note && (
-                  <div className="text-slate-400 text-[11px] mb-2">{alt.note}</div>
-                )}
-                {alt.fullText && (
-                  <div className="text-slate-300 italic line-clamp-2">
-                    "{alt.fullText}"
+                <div>
+                  <div className="font-cinzel font-bold text-sacred-300 group-hover:text-sacred-200 mb-1 flex items-center justify-between">
+                    <span className="flex items-center gap-1">📖 {alt.reference}</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-sacred-400 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
                   </div>
-                )}
-              </div>
+                  {alt.note && (
+                    <div className="text-slate-300 font-medium text-[11px] mb-2 line-clamp-2">
+                      {alt.note}
+                    </div>
+                  )}
+                  {alt.fullText && (
+                    <div className="text-slate-400 italic line-clamp-2 text-[11px]">
+                      "{alt.fullText.replace(/\[\d+\]/g, "").trim()}"
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-3 pt-2 border-t border-sanctuary-700/50 flex items-center justify-between text-[11px] text-sacred-400 group-hover:text-sacred-300 font-semibold">
+                  <span>Selecionar & Meditar</span>
+                  <span className="text-xs">➔</span>
+                </div>
+              </button>
             ))}
           </div>
         </div>
@@ -146,4 +195,3 @@ export function DevotionalTabs({
     </div>
   );
 }
-

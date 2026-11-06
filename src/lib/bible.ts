@@ -343,6 +343,8 @@ export function buildThematicResponse(theme: ThemeItem, version: "nvi" | "aa" = 
       fullText: res ? res.fullText : "",
       book: alt.book,
       chapter: alt.chapter,
+      startVerse: alt.start_verse,
+      endVerse: alt.end_verse,
     };
   });
 

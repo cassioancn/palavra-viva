@@ -12,6 +12,7 @@ import {
   buildStoryResponse,
   buildFullTextSearchResponse,
   getDiverseComfortFallback,
+  getMorePassagesForContext,
   ResolvedBibleResponse,
 } from "@/lib/bibleSearchEngine";
 
@@ -19,6 +20,7 @@ interface RequestBody {
   feeling: string;
   version?: "nvi" | "aa";
   mode?: "counsel" | "search";
+  excludeReferences?: string[];
 }
 
 function cleanJsonResponse(raw: string): string {
@@ -49,6 +51,12 @@ export async function POST(req: NextRequest) {
     // -------------------------------------------------------------
     const directParsed = parsePassageReference(query, version);
     if (directParsed) {
+      const alts = getMorePassagesForContext({
+        context: directParsed.book,
+        excludeReferences: [directParsed.reference, ...(body.excludeReferences || [])],
+        version,
+        limit: 3,
+      });
       return NextResponse.json({
         success: true,
         isAiGenerated: false,
@@ -58,7 +66,7 @@ export async function POST(req: NextRequest) {
         historicalContext: `Texto das Sagradas Escrituras traduzido com fidelidade na versão ${version.toUpperCase()}.`,
         guidedPrayer: `Senhor Deus, abro o meu coração para a Tua Palavra em ${directParsed.reference}. Que ela seja lâmpada para os meus pés e luz para o meu caminho. Em nome de Jesus, amém.`,
         practicalStep: `Leia novamente este trecho com calma e guarde no coração o ensinamento principal que Deus falou com você.`,
-        alternativePassages: [],
+        alternativePassages: alts,
       });
     }
 
@@ -126,6 +134,17 @@ export async function POST(req: NextRequest) {
     // 2.F: Fallback diverso (NUNCA fica em loop no Salmo 23)
     if (!candidateResponse) {
       candidateResponse = getDiverseComfortFallback(version);
+    }
+
+    // Garante que o retorno sempre tenha passagens alternativas enriquecidas e sem repetição
+    if (!candidateResponse.alternativePassages || candidateResponse.alternativePassages.length === 0) {
+      candidateResponse.alternativePassages = getMorePassagesForContext({
+        context: query,
+        themeId: (candidateResponse as any).themeId,
+        excludeReferences: [candidateResponse.passage.reference, ...(body.excludeReferences || [])],
+        version,
+        limit: 3,
+      });
     }
 
     // Se NÃO houver chave do Gemini configurada no servidor, entrega a resposta imediata

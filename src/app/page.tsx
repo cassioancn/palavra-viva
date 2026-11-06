@@ -29,6 +29,8 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [result, setResult] = useState<any | null>(null);
+  const [seenReferences, setSeenReferences] = useState<string[]>([]);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isPixOpen, setIsPixOpen] = useState(false);
@@ -79,6 +81,7 @@ export default function HomePage() {
         body: JSON.stringify({
           feeling: query,
           version,
+          mode: searchMode,
         }),
       });
 
@@ -89,6 +92,11 @@ export default function HomePage() {
 
       setResult(data);
 
+      // Registra referências já vistas para evitar loops
+      const currentRef = data.passage?.reference;
+      const alts = (data.alternativePassages || []).map((a: any) => a.reference);
+      setSeenReferences(Array.from(new Set([currentRef, ...alts].filter(Boolean))));
+
       // Smooth scroll to result
       setTimeout(() => {
         resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -97,6 +105,114 @@ export default function HomePage() {
       setErrorMsg(err.message || "Ocorreu um erro inesperado. Tente novamente.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSelectAlternative = async (alt: any) => {
+    if (!alt || !alt.reference) return;
+
+    const previousPassage = result?.passage;
+    const previousThemeTitle = result?.themeTitle;
+
+    setSeenReferences((prev) => Array.from(new Set([...prev, alt.reference])));
+    setIsLoading(true);
+    setErrorMsg(null);
+
+    try {
+      const res = await fetch("/api/counsel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          feeling: alt.reference,
+          version,
+          mode: "search",
+          excludeReferences: seenReferences,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Erro ao carregar a passagem selecionada.");
+      }
+
+      // Faz o swap inteligente: a passagem anterior vai para a lista de alternativas
+      let newAlternatives = (result?.alternativePassages || []).filter(
+        (a: any) => a.reference !== alt.reference
+      );
+
+      if (
+        previousPassage &&
+        !newAlternatives.some((a: any) => a.reference === previousPassage.reference)
+      ) {
+        newAlternatives = [
+          {
+            reference: previousPassage.reference,
+            note: previousThemeTitle || "Passagem anterior",
+            fullText: previousPassage.fullText,
+            book: previousPassage.book,
+            chapter: previousPassage.chapter,
+            startVerse: previousPassage.startVerse,
+            endVerse: previousPassage.endVerse,
+          },
+          ...newAlternatives,
+        ];
+      }
+
+      setResult({
+        ...data,
+        themeId: result?.themeId,
+        alternativePassages: newAlternatives.slice(0, 3),
+      });
+
+      setTimeout(() => {
+        resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+    } catch (err: any) {
+      setErrorMsg(err.message || "Erro ao carregar versículo.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFetchMorePassages = async () => {
+    if (!result) return;
+    setIsLoadingMore(true);
+
+    try {
+      const currentAlts = (result.alternativePassages || []).map((a: any) => a.reference);
+      const allExcluded = Array.from(
+        new Set([
+          ...seenReferences,
+          result.passage?.reference,
+          ...currentAlts,
+        ].filter(Boolean))
+      );
+
+      const res = await fetch("/api/more-passages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          context: feeling || result.themeTitle || result.passage?.reference,
+          themeId: result.themeId,
+          excludeReferences: allExcluded,
+          version,
+          limit: 3,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success && data.passages && data.passages.length > 0) {
+        setResult((prev: any) => ({
+          ...prev,
+          alternativePassages: data.passages,
+        }));
+        const newRefs = data.passages.map((p: any) => p.reference);
+        setSeenReferences((prev) => Array.from(new Set([...prev, ...newRefs])));
+      }
+    } catch (err) {
+      console.error("Erro ao buscar mais passagens:", err);
+    } finally {
+      setIsLoadingMore(false);
     }
   };
 
@@ -285,6 +401,9 @@ export default function HomePage() {
                 guidedPrayer={result.guidedPrayer}
                 practicalStep={result.practicalStep}
                 alternativePassages={result.alternativePassages}
+                onSelectAlternative={handleSelectAlternative}
+                onFetchMorePassages={handleFetchMorePassages}
+                isLoadingMore={isLoadingMore}
               />
 
               {/* Bloco de Monetização 1: Recomendações de Bíblias & Livros na Amazon */}
