@@ -14,6 +14,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { generateVerseStoryImage } from "@/lib/storyImage";
+import { SITE_URL } from "@/lib/config";
 
 interface WhatsAppShareModalProps {
   isOpen: boolean;
@@ -95,7 +96,7 @@ export function WhatsAppShareModal({
           : reflectionText;
       msg += `\n\n💬 *Mensagem para o seu coração:*\n${cleanReflection}`;
     }
-    msg += `\n\n🙏 _Que esta palavra de Deus encha a sua vida de paz, fé e consolo hoje!_`;
+    msg += `\n\n🙏 _Que esta palavra de Deus encha a sua vida de paz, fé e consolo hoje!_\n\n🌐 Acesse: ${SITE_URL}`;
     return msg;
   };
 

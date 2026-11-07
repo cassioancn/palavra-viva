@@ -11,6 +11,9 @@ import { PixDonationModal } from "@/components/PixDonationModal";
 import { RecommendedBooks } from "@/components/RecommendedBooks";
 import { AdBanner } from "@/components/AdBanner";
 import { Footer } from "@/components/Footer";
+import { LegalModal, type LegalTab } from "@/components/LegalModal";
+import { ContactModal } from "@/components/ContactModal";
+import { MobileStickyBar } from "@/components/MobileStickyBar";
 import {
   Sparkles,
   Send,
@@ -20,6 +23,7 @@ import {
   Heart,
   BookOpen,
   Search,
+  RefreshCw,
 } from "lucide-react";
 
 export default function HomePage() {
@@ -36,6 +40,14 @@ export default function HomePage() {
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isPixOpen, setIsPixOpen] = useState(false);
+  const [isContactOpen, setIsContactOpen] = useState(false);
+  const [legalModal, setLegalModal] = useState<{
+    isOpen: boolean;
+    tab: LegalTab;
+  }>({
+    isOpen: false,
+    tab: "disclaimer",
+  });
   const [chapterModal, setChapterModal] = useState<{
     isOpen: boolean;
     book: string;
@@ -51,6 +63,12 @@ export default function HomePage() {
   });
 
   const resultRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleScrollToSearch = () => {
+    searchInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    searchInputRef.current?.focus();
+  };
 
   // Load version preference from localStorage on mount
   useEffect(() => {
@@ -401,6 +419,7 @@ export default function HomePage() {
         <div className="w-full rounded-2xl bg-sanctuary-900 border border-sanctuary-700/80 p-5 sm:p-6 shadow-xl space-y-4">
           <div className="relative">
             <textarea
+              ref={searchInputRef}
               value={feeling}
               onChange={(e) => setFeeling(e.target.value)}
               placeholder={
@@ -415,9 +434,41 @@ export default function HomePage() {
           </div>
 
           {errorMsg && (
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center gap-2.5 text-xs sm:text-sm text-rose-300">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
-              <span>{errorMsg}</span>
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-sanctuary-950 to-sanctuary-900 border border-amber-500/35 shadow-lg space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 shrink-0">
+                  <AlertCircle className="w-5 h-5" />
+                </div>
+                <div className="space-y-1 text-left">
+                  <h4 className="text-sm font-cinzel font-bold text-amber-300">
+                    Mensagem de Cuidado & Fé
+                  </h4>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    {errorMsg}
+                  </p>
+                  <p className="text-[11px] text-slate-400 italic">
+                    "O Senhor é o meu pastor; de nada terei falta." — Salmos 23:1
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-sanctuary-800">
+                <button
+                  type="button"
+                  onClick={() => executeSearch(feeling || "Salmos 23")}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-sacred-500/20 hover:bg-sacred-500/30 text-sacred-300 border border-sacred-500/30 transition-all active:scale-95"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>Tentar Novamente</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => executeSearch("Salmos 23")}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-sanctuary-800 hover:bg-sanctuary-750 text-slate-300 transition-colors"
+                >
+                  <BookOpen className="w-3.5 h-3.5 text-sacred-400" />
+                  <span>Ler Salmo 23</span>
+                </button>
+              </div>
             </div>
           )}
 
@@ -531,9 +582,31 @@ export default function HomePage() {
         </div>
       </main>
 
-      <Footer />
+      <Footer
+        onOpenLegal={(tab) => setLegalModal({ isOpen: true, tab })}
+        onOpenContact={() => setIsContactOpen(true)}
+        onOpenPix={() => setIsPixOpen(true)}
+      />
+
+      {/* Sticky CTA Mobile para Apoio Pix ou Nova Busca */}
+      <MobileStickyBar
+        onOpenPix={() => setIsPixOpen(true)}
+        onScrollToSearch={handleScrollToSearch}
+        hasResult={Boolean(result?.passage)}
+      />
 
       {/* Modals */}
+      <LegalModal
+        isOpen={legalModal.isOpen}
+        initialTab={legalModal.tab}
+        onClose={() => setLegalModal((prev) => ({ ...prev, isOpen: false }))}
+      />
+
+      <ContactModal
+        isOpen={isContactOpen}
+        onClose={() => setIsContactOpen(false)}
+      />
+
       <ChapterModal
         isOpen={chapterModal.isOpen}
         book={chapterModal.book}

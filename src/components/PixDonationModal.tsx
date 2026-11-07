@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Heart, Copy, Check, QrCode, Loader2, Sparkles } from "lucide-react";
 import { generatePixPayload, generatePixQrCode } from "@/lib/pix";
+import { PIX_KEY, PIX_RECIPIENT } from "@/lib/config";
 
 interface PixDonationModalProps {
   isOpen: boolean;
@@ -16,10 +17,8 @@ export function PixDonationModal({ isOpen, onClose }: PixDonationModalProps) {
   const [pixPayload, setPixPayload] = useState<string>("");
   const [isLoadingQr, setIsLoadingQr] = useState<boolean>(true);
 
-  const pixKey =
-    process.env.NEXT_PUBLIC_PIX_KEY || "f84f3560-de18-4c7a-b571-622465e50011";
-  const pixRecipient =
-    process.env.NEXT_PUBLIC_PIX_NAME || "Projeto Palavra Viva";
+  const pixKey = process.env.NEXT_PUBLIC_PIX_KEY || PIX_KEY;
+  const pixRecipient = process.env.NEXT_PUBLIC_PIX_NAME || PIX_RECIPIENT;
 
   useEffect(() => {
     if (!isOpen) return;
