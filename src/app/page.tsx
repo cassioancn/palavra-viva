@@ -31,6 +31,7 @@ export default function HomePage() {
   const [result, setResult] = useState<any | null>(null);
   const [seenReferences, setSeenReferences] = useState<string[]>([]);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [isLoadingNextMain, setIsLoadingNextMain] = useState(false);
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isPixOpen, setIsPixOpen] = useState(false);
@@ -216,6 +217,83 @@ export default function HomePage() {
     }
   };
 
+  const handleFetchNextMainPassage = async () => {
+    if (!result || isLoadingNextMain) return;
+    setIsLoadingNextMain(true);
+    setErrorMsg(null);
+
+    try {
+      const currentMainRef = result.passage?.reference;
+      const currentAlts = (result.alternativePassages || []).map((a: any) => a.reference);
+      const allExcluded = Array.from(
+        new Set([
+          ...seenReferences,
+          currentMainRef,
+          ...currentAlts,
+        ].filter(Boolean))
+      );
+
+      const res = await fetch("/api/counsel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          feeling: feeling || result.themeTitle || currentMainRef,
+          version,
+          mode: searchMode,
+          excludeReferences: allExcluded,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Não encontramos outra passagem inédita para este contexto.");
+      }
+
+      // Passagem principal anterior vai para as alternativas para preservar o histórico
+      let newAlternatives = (data.alternativePassages || []).filter(
+        (a: any) => a.reference !== data.passage?.reference
+      );
+
+      if (
+        result.passage &&
+        !newAlternatives.some((a: any) => a.reference === currentMainRef)
+      ) {
+        newAlternatives = [
+          {
+            reference: result.passage.reference,
+            note: result.themeTitle || "Passagem anterior",
+            fullText: result.passage.fullText,
+            book: result.passage.book,
+            chapter: result.passage.chapter,
+            startVerse: result.passage.startVerse,
+            endVerse: result.passage.endVerse,
+          },
+          ...newAlternatives,
+        ];
+      }
+
+      setResult({
+        ...data,
+        themeId: result.themeId || data.themeId,
+        alternativePassages: newAlternatives.slice(0, 3),
+      });
+
+      const newMainRef = data.passage?.reference;
+      const newAltRefs = newAlternatives.map((a: any) => a.reference);
+      setSeenReferences((prev) =>
+        Array.from(new Set([...prev, currentMainRef, newMainRef, ...newAltRefs].filter(Boolean)))
+      );
+
+      setTimeout(() => {
+        resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 80);
+    } catch (err: any) {
+      setErrorMsg(err.message || "Erro ao buscar outra passagem.");
+    } finally {
+      setIsLoadingNextMain(false);
+    }
+  };
+
   const handleChipSelect = (query: string) => {
     setFeeling(query);
     executeSearch(query);
@@ -393,6 +471,9 @@ export default function HomePage() {
                 chapter={result.passage.chapter}
                 isAiGenerated={result.isAiGenerated}
                 onOpenChapter={handleOpenChapter}
+                onFetchNextPassage={handleFetchNextMainPassage}
+                isLoadingNext={isLoadingNextMain}
+                reflectionText={result.pastoralReflection}
               />
 
               <DevotionalTabs

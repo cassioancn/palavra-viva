@@ -9,10 +9,13 @@ import {
   Check,
   BookOpen,
   ShieldCheck,
+  RotateCcw,
   Sparkles,
   Instagram,
+  MessageCircle,
 } from "lucide-react";
 import { InstagramStoryModal } from "./InstagramStoryModal";
+import { WhatsAppShareModal } from "./WhatsAppShareModal";
 
 interface VerseCardProps {
   reference: string;
@@ -23,6 +26,9 @@ interface VerseCardProps {
   chapter: number;
   isAiGenerated: boolean;
   onOpenChapter: (book: string, chapter: number) => void;
+  onFetchNextPassage?: () => void;
+  isLoadingNext?: boolean;
+  reflectionText?: string;
 }
 
 export function VerseCard({
@@ -34,11 +40,15 @@ export function VerseCard({
   chapter,
   isAiGenerated,
   onOpenChapter,
+  onFetchNextPassage,
+  isLoadingNext = false,
+  reflectionText,
 }: VerseCardProps) {
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [copied, setCopied] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
   const [isInstagramOpen, setIsInstagramOpen] = useState(false);
+  const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
@@ -94,14 +104,6 @@ export function VerseCard({
     }
   };
 
-  const handleShareWhatsApp = () => {
-    const message = `✝️ *Palavra Viva para o seu coração*\n\n"${fullText}"\n\n📖 *${reference} (${version})*\n_${themeTitle}_\n\nEncontre consolo na Palavra de Deus:\nhttps://palavra-viva.cassio-contra.workers.dev`;
-    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(
-      message
-    )}`;
-    window.open(url, "_blank");
-  };
-
   return (
     <div className="relative w-full rounded-2xl bg-gradient-to-b from-sanctuary-800 to-sanctuary-900 border border-sacred-500/30 p-6 sm:p-8 shadow-glow-lg transition-all duration-300">
       {/* Top Badges */}
@@ -117,9 +119,22 @@ export function VerseCard({
         </div>
 
         {themeTitle && (
-          <span className="text-xs font-medium text-slate-400 bg-sanctuary-700/50 px-2.5 py-1 rounded-md border border-sanctuary-600/50">
-            Tema: <strong className="text-slate-200">{themeTitle}</strong>
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-slate-400 bg-sanctuary-700/50 px-2.5 py-1 rounded-md border border-sanctuary-600/50">
+              Tema: <strong className="text-slate-200">{themeTitle}</strong>
+            </span>
+            {onFetchNextPassage && (
+              <button
+                onClick={onFetchNextPassage}
+                disabled={isLoadingNext}
+                className="inline-flex sm:hidden items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold text-sacred-300 bg-sacred-500/10 border border-sacred-500/30 hover:bg-sacred-500/20 active:scale-95 disabled:opacity-50"
+                title="Buscar outra passagem para este tema"
+              >
+                <RotateCcw className={`w-3 h-3 ${isLoadingNext ? "animate-spin text-sacred-400" : ""}`} />
+                <span>Outra</span>
+              </button>
+            )}
+          </div>
         )}
       </div>
 
@@ -139,8 +154,8 @@ export function VerseCard({
       </div>
 
       <div className="border-t border-sanctuary-700/60 pt-4 flex flex-wrap items-center justify-between gap-3">
-        {/* Audio Player Control */}
-        <div className="flex items-center gap-2">
+        {/* Audio Player, Chapter & Next Passage Controls */}
+        <div className="flex flex-wrap items-center gap-2">
           {speechSupported && (
             <button
               onClick={handleToggleAudio}
@@ -171,6 +186,20 @@ export function VerseCard({
             <BookOpen className="w-4 h-4 text-sky-400" />
             <span>Capítulo Completo</span>
           </button>
+
+          {/* Botão de Buscar Outra Passagem no Card Principal */}
+          {onFetchNextPassage && (
+            <button
+              type="button"
+              onClick={onFetchNextPassage}
+              disabled={isLoadingNext}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-sacred-500/15 hover:bg-sacred-500/25 text-sacred-300 hover:text-sacred-200 border border-sacred-500/40 shadow-sm transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+              title="Buscar outro versículo bíblico principal para esta mesma situação"
+            >
+              <RotateCcw className={`w-4 h-4 text-sacred-400 ${isLoadingNext ? "animate-spin" : ""}`} />
+              <span>{isLoadingNext ? "Buscando..." : "Buscar outra passagem"}</span>
+            </button>
+          )}
         </div>
 
         {/* Share & Copy Controls */}
@@ -193,12 +222,13 @@ export function VerseCard({
             )}
           </button>
 
+          {/* Botão WhatsApp com Modal de Compartilhamento Dedicado */}
           <button
-            onClick={handleShareWhatsApp}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-[#25D366]/90 hover:bg-[#25D366] text-white shadow-sm transition-all hover:scale-105 active:scale-95"
-            title="Compartilhar no WhatsApp"
+            onClick={() => setIsWhatsAppOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-[#25D366]/90 hover:bg-[#25D366] text-sanctuary-950 shadow-sm transition-all hover:scale-105 active:scale-95"
+            title="Compartilhar Imagem e Mensagem no WhatsApp"
           >
-            <Share2 className="w-4 h-4" />
+            <MessageCircle className="w-4 h-4" />
             <span>WhatsApp</span>
           </button>
 
@@ -213,6 +243,17 @@ export function VerseCard({
         </div>
       </div>
 
+      {/* WhatsApp Share Modal */}
+      <WhatsAppShareModal
+        isOpen={isWhatsAppOpen}
+        onClose={() => setIsWhatsAppOpen(false)}
+        reference={reference}
+        version={version}
+        text={fullText}
+        themeTitle={themeTitle}
+        reflectionText={reflectionText}
+      />
+
       {/* Instagram Story Modal */}
       <InstagramStoryModal
         isOpen={isInstagramOpen}
@@ -225,4 +266,3 @@ export function VerseCard({
     </div>
   );
 }
-

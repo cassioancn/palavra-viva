@@ -69,3 +69,4 @@ export function BrandLogo({ className = "w-5 h-5", variant = "radiant" }: BrandL
     </svg>
   );
 }
+

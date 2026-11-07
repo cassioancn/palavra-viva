@@ -279,7 +279,7 @@ export async function generateVerseStoryImage({
 
   ctx.font = "bold 26px 'Cinzel', Georgia, serif";
   ctx.fillStyle = "#92400e";
-  ctx.fillText("palavra-viva.cassio-contra.workers.dev", width / 2, height - 125);
+  ctx.fillText("PALAVRA VIVA • BÍBLIA SAGRADA", width / 2, height - 125);
 
   return new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((blob) => {
