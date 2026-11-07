@@ -879,6 +879,7 @@ export function searchBibleFullText(
 export interface ResolvedBibleResponse {
   success: boolean;
   isAiGenerated: boolean;
+  themeId?: string;
   themeTitle: string;
   passage: PassageResult;
   pastoralReflection: string;
@@ -946,8 +947,24 @@ export const DIVERSE_COMFORT_VERSES = [
   { book: "Salmos", chapter: 23, start: 1, end: 6, title: "O Senhor é o Meu Pastor" },
 ];
 
-export function getDiverseComfortFallback(version: "nvi" | "aa" = "nvi"): ResolvedBibleResponse {
-  const pick = DIVERSE_COMFORT_VERSES[Math.floor(Math.random() * DIVERSE_COMFORT_VERSES.length)];
+export function getDiverseComfortFallback(
+  version: "nvi" | "aa" = "nvi",
+  excludeReferences: string[] = []
+): ResolvedBibleResponse {
+  const normExcluded = new Set(
+    (excludeReferences || []).map((r) => stripAccents(r).replace(/\s+/g, ""))
+  );
+
+  const available = DIVERSE_COMFORT_VERSES.filter((c) => {
+    const ref =
+      c.start === c.end
+        ? `${c.book} ${c.chapter}:${c.start}`
+        : `${c.book} ${c.chapter}:${c.start}-${c.end}`;
+    return !normExcluded.has(stripAccents(ref).replace(/\s+/g, ""));
+  });
+
+  const pool = available.length > 0 ? available : DIVERSE_COMFORT_VERSES;
+  const pick = pool[Math.floor(Math.random() * pool.length)];
   const p = getPassage(pick.book, pick.chapter, pick.start, pick.end, version)!;
 
   return {

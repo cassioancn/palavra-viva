@@ -329,35 +329,137 @@ export function getRandomComfortVerse(version: "nvi" | "aa" = "nvi"): PassageRes
   );
 }
 
-export function buildThematicResponse(theme: ThemeItem, version: "nvi" | "aa" = "nvi") {
-  const prim = theme.primary_passage;
-  const passage =
-    getPassage(prim.book, prim.chapter, prim.start_verse, prim.end_verse, version) ||
-    getPassage("Salmos", 23, 1, 3, version)!;
+export function buildThematicResponse(
+  theme: ThemeItem,
+  version: "nvi" | "aa" = "nvi",
+  excludeReferences: string[] = []
+) {
+  const normExcluded = new Set(
+    (excludeReferences || []).map((r) => stripAccents(r).replace(/\s+/g, ""))
+  );
 
-  const alternativePassages = (theme.alternative_passages || []).map((alt) => {
-    const res = getPassage(alt.book, alt.chapter, alt.start_verse, alt.end_verse, version);
-    return {
-      reference: res ? res.reference : `${alt.book} ${alt.chapter}:${alt.start_verse}`,
-      note: alt.note || "",
-      fullText: res ? res.fullText : "",
-      book: alt.book,
-      chapter: alt.chapter,
-      startVerse: alt.start_verse,
-      endVerse: alt.end_verse,
-    };
+  const isExcluded = (ref: string) => {
+    if (!ref) return false;
+    const clean = stripAccents(ref).replace(/\s+/g, "");
+    return normExcluded.has(clean);
+  };
+
+  interface CandidateEntry {
+    book: string;
+    chapter: number;
+    startVerse: number;
+    endVerse?: number;
+    themeTitle?: string;
+    note?: string;
+    reflection?: string;
+    contextSummary?: string;
+    guidedPrayer?: string;
+    practicalStep?: string;
+  }
+
+  const allCandidates: CandidateEntry[] = [];
+
+  // 1. Passagem primária do catálogo
+  const prim = theme.primary_passage;
+  allCandidates.push({
+    book: prim.book,
+    chapter: prim.chapter,
+    startVerse: prim.start_verse,
+    endVerse: prim.end_verse,
+    themeTitle: prim.theme_title,
+    reflection: prim.reflection,
+    contextSummary: prim.context_summary,
+    guidedPrayer: prim.guided_prayer,
+    practicalStep: prim.practical_step,
   });
+
+  // 2. Passagens alternativas cadastradas no tema
+  if (theme.alternative_passages) {
+    for (const alt of theme.alternative_passages) {
+      allCandidates.push({
+        book: alt.book,
+        chapter: alt.chapter,
+        startVerse: alt.start_verse,
+        endVerse: alt.end_verse,
+        note: alt.note,
+        themeTitle: alt.note,
+      });
+    }
+  }
+
+  // 3. Encontra o primeiro candidato que NÃO está na lista de excluídos
+  let chosenEntry: CandidateEntry | null = null;
+  let chosenPassage: PassageResult | null = null;
+
+  for (const cand of allCandidates) {
+    const p = getPassage(cand.book, cand.chapter, cand.startVerse, cand.endVerse, version);
+    if (p && !isExcluded(p.reference)) {
+      chosenEntry = cand;
+      chosenPassage = p;
+      break;
+    }
+  }
+
+  // Se todos os candidatos foram excluídos, usa o primário como fallback seguro
+  if (!chosenPassage) {
+    chosenEntry = allCandidates[0];
+    chosenPassage =
+      getPassage(prim.book, prim.chapter, prim.start_verse, prim.end_verse, version) ||
+      getPassage("Salmos", 23, 1, 3, version)!;
+  }
+
+  // Registra a passagem escolhida como excluída para as alternativas secundárias
+  normExcluded.add(stripAccents(chosenPassage.reference).replace(/\s+/g, ""));
+
+  // 4. Monta as alternativas (somente passagens ainda inéditas)
+  const alternativePassages = [];
+  for (const cand of allCandidates) {
+    if (alternativePassages.length >= 3) break;
+    const p = getPassage(cand.book, cand.chapter, cand.startVerse, cand.endVerse, version);
+    if (p && !isExcluded(p.reference)) {
+      normExcluded.add(stripAccents(p.reference).replace(/\s+/g, ""));
+      alternativePassages.push({
+        reference: p.reference,
+        note: cand.note || cand.themeTitle || `Palavra de consolo em ${cand.book}`,
+        fullText: p.fullText,
+        book: cand.book,
+        chapter: cand.chapter,
+        startVerse: cand.startVerse,
+        endVerse: cand.endVerse || cand.startVerse,
+      });
+    }
+  }
+
+  // 5. Constrói a reflexão pastoral, oração e contexto específicos para a passagem
+  const finalThemeTitle =
+    chosenEntry?.themeTitle || chosenEntry?.note || prim.theme_title || theme.title;
+
+  const finalReflection =
+    chosenEntry?.reflection ||
+    `Ao meditarmos em ${chosenPassage.reference}, encontramos a resposta e o alento do coração de Deus para a nossa vida diante de ${theme.title.toLowerCase()}. As Escrituras Sagradas nos asseguram que Suas promessas não falham e que o Senhor caminha ao nosso lado em qualquer circunstância. Permita que esta Palavra viva habite ricamente em você hoje, renovando as suas forças e trazendo a paz que o mundo não pode tirar.`;
+
+  const finalContext =
+    chosenEntry?.contextSummary ||
+    `Passagem canônica das Sagradas Escrituras preservada no livro de ${chosenPassage.book}, capítulo ${chosenPassage.chapter}, trazendo mensagens de sabedoria, consolo e direção pastoral.`;
+
+  const finalPrayer =
+    chosenEntry?.guidedPrayer ||
+    `Senhor meu Deus e Pai, coloco o meu coração diante de Ti nesta hora, alicerçado na Tua Palavra em ${chosenPassage.reference}. Eu confio que o Senhor cuida de cada detalhe da minha vida. Derrama a Tua paz e a Tua direção sobre os meus passos. Em nome de Jesus, amém.`;
+
+  const finalStep =
+    chosenEntry?.practicalStep ||
+    `Guarde este versículo em seu coração durante o dia de hoje. Quando o desânimo ou a ansiedade tentarem entrar, declare a fidelidade de Deus.`;
 
   return {
     success: true,
     isAiGenerated: false,
     themeId: theme.id,
-    themeTitle: prim.theme_title || theme.title,
-    passage,
-    pastoralReflection: prim.reflection || "",
-    historicalContext: prim.context_summary || "",
-    guidedPrayer: prim.guided_prayer || "",
-    practicalStep: prim.practical_step || "",
+    themeTitle: finalThemeTitle,
+    passage: chosenPassage,
+    pastoralReflection: finalReflection,
+    historicalContext: finalContext,
+    guidedPrayer: finalPrayer,
+    practicalStep: finalStep,
     alternativePassages,
   };
 }

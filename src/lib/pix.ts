@@ -78,3 +78,4 @@ export async function generatePixQrCode(payload: string): Promise<string> {
     errorCorrectionLevel: "M",
   });
 }
+

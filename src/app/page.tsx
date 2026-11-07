@@ -29,6 +29,7 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [result, setResult] = useState<any | null>(null);
+  const [currentThemeId, setCurrentThemeId] = useState<string | null>(null);
   const [seenReferences, setSeenReferences] = useState<string[]>([]);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isLoadingNextMain, setIsLoadingNextMain] = useState(false);
@@ -68,12 +69,14 @@ export default function HomePage() {
     }
   };
 
-  const executeSearch = async (textToSearch: string) => {
+  const executeSearch = async (textToSearch: string, themeIdOverride?: string) => {
     const query = textToSearch.trim();
     if (!query) return;
 
     setIsLoading(true);
     setErrorMsg(null);
+
+    const activeTheme = themeIdOverride !== undefined ? themeIdOverride : currentThemeId;
 
     try {
       const res = await fetch("/api/counsel", {
@@ -81,6 +84,7 @@ export default function HomePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           feeling: query,
+          themeId: activeTheme,
           version,
           mode: searchMode,
         }),
@@ -92,6 +96,9 @@ export default function HomePage() {
       }
 
       setResult(data);
+      if (data.themeId) {
+        setCurrentThemeId(data.themeId);
+      }
 
       // Registra referências já vistas para evitar loops
       const currentRef = data.passage?.reference;
@@ -233,11 +240,14 @@ export default function HomePage() {
         ].filter(Boolean))
       );
 
+      const activeThemeId = result.themeId || currentThemeId;
+
       const res = await fetch("/api/counsel", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           feeling: feeling || result.themeTitle || currentMainRef,
+          themeId: activeThemeId,
           version,
           mode: searchMode,
           excludeReferences: allExcluded,
@@ -278,6 +288,10 @@ export default function HomePage() {
         alternativePassages: newAlternatives.slice(0, 3),
       });
 
+      if (data.themeId) {
+        setCurrentThemeId(data.themeId);
+      }
+
       const newMainRef = data.passage?.reference;
       const newAltRefs = newAlternatives.map((a: any) => a.reference);
       setSeenReferences((prev) =>
@@ -294,9 +308,10 @@ export default function HomePage() {
     }
   };
 
-  const handleChipSelect = (query: string) => {
+  const handleChipSelect = (query: string, themeId?: string) => {
     setFeeling(query);
-    executeSearch(query);
+    if (themeId) setCurrentThemeId(themeId);
+    executeSearch(query, themeId);
   };
 
   const handleOpenChapter = (book: string, chapter: number) => {

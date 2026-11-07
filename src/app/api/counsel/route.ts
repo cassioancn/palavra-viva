@@ -5,6 +5,8 @@ import {
   matchThemeByText,
   buildThematicResponse,
   parsePassageReference,
+  getThemeById,
+  stripAccents,
 } from "@/lib/bible";
 import {
   matchBiblicalStory,
@@ -21,6 +23,7 @@ interface RequestBody {
   version?: "nvi" | "aa";
   mode?: "counsel" | "search";
   excludeReferences?: string[];
+  themeId?: string;
 }
 
 function cleanJsonResponse(raw: string): string {
@@ -46,14 +49,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const excludeRefs = body.excludeReferences || [];
+    const normExcluded = new Set(
+      excludeRefs.map((r) => stripAccents(r).replace(/\s+/g, ""))
+    );
+    const isExcluded = (ref: string) => {
+      if (!ref) return false;
+      const clean = stripAccents(ref).replace(/\s+/g, "");
+      return normExcluded.has(clean);
+    };
+
     // -------------------------------------------------------------
     // ETAPA 1: PARSER DE REFERÊNCIA DIRETA ("João 3:16", "Sl 23", "1 Co 13:4", etc.)
     // -------------------------------------------------------------
     const directParsed = parsePassageReference(query, version);
-    if (directParsed) {
+    if (directParsed && !isExcluded(directParsed.reference)) {
       const alts = getMorePassagesForContext({
         context: directParsed.book,
-        excludeReferences: [directParsed.reference, ...(body.excludeReferences || [])],
+        excludeReferences: [directParsed.reference, ...excludeRefs],
         version,
         limit: 3,
       });
@@ -75,39 +88,79 @@ export async function POST(req: NextRequest) {
     // -------------------------------------------------------------
     let candidateResponse: ResolvedBibleResponse | null = null;
 
-    // 2.A: Busca em Narrativas, Parábolas e Eventos Marcantes da Bíblia
-    const matchedStory = matchBiblicalStory(query);
-    if (matchedStory) {
-      candidateResponse = buildStoryResponse(matchedStory, version);
+    // 2.A: Resolução Temática (Prioritária para botões de sentimento e temas pastorais)
+    let theme = body.themeId ? getThemeById(body.themeId) : null;
+    if (!theme && mode === "counsel") {
+      theme = matchThemeByText(query);
     }
 
-    // 2.B: Se em modo "counsel", prioriza catálogo temático pastoral de emoções
-    if (!candidateResponse && mode === "counsel") {
-      const theme = matchThemeByText(query);
-      if (theme) {
-        candidateResponse = buildThematicResponse(theme, version) as ResolvedBibleResponse;
+    if (theme) {
+      const thematicResp = buildThematicResponse(theme, version, excludeRefs) as ResolvedBibleResponse;
+      if (thematicResp && !isExcluded(thematicResp.passage.reference)) {
+        candidateResponse = thematicResp;
       }
     }
 
-    // 2.C: Busca Textual Completa com Stemmer, Stopwords e Sinônimos (~31.000 versículos)
+    // 2.B: Busca em Narrativas, Parábolas e Eventos Marcantes da Bíblia
     if (!candidateResponse) {
-      const textMatches = searchBibleFullText(query, version, 1);
-      if (textMatches.length > 0) {
-        const fullTextResp = buildFullTextSearchResponse(textMatches[0], version);
-        if (fullTextResp) {
-          candidateResponse = fullTextResp;
+      const matchedStory = matchBiblicalStory(query);
+      if (matchedStory) {
+        const storyResp = buildStoryResponse(matchedStory, version);
+        if (storyResp && !isExcluded(storyResp.passage.reference)) {
+          candidateResponse = storyResp;
         }
       }
     }
 
-    // 2.D: Se ainda não encontrou e está em modo busca específica, busca na versão alternativa
+    // 2.C: Catálogo Estendido por Contexto / Tema (Garante passagem inédita mesmo após muitas trocas)
+    if (!candidateResponse && (theme || mode === "counsel")) {
+      const morePassages = getMorePassagesForContext({
+        context: query,
+        themeId: theme?.id || body.themeId,
+        excludeReferences: excludeRefs,
+        version,
+        limit: 1,
+      });
+
+      if (morePassages.length > 0) {
+        const m = morePassages[0];
+        const p = getPassage(m.book, m.chapter, m.startVerse, m.endVerse, version);
+        if (p && !isExcluded(p.reference)) {
+          candidateResponse = {
+            success: true,
+            isAiGenerated: false,
+            themeId: theme?.id || body.themeId,
+            themeTitle: m.note || theme?.title || `Passagem em ${m.book}`,
+            passage: p,
+            pastoralReflection: `Ao nos voltarmos para ${p.reference}, encontramos o amparo fiel das Sagradas Escrituras. A graça de Deus é suficiente para cada estação da vida e Suas promessas de paz permanecem firmes para o seu coração hoje.`,
+            historicalContext: `Texto canônico das Sagradas Escrituras registrado no livro de ${m.book}, capítulo ${m.chapter}, transmitindo ensinamentos eternos de fé.`,
+            guidedPrayer: `Senhor Deus, achego-me a Ti amparado em ${p.reference}. Sei que o Senhor conhece as minhas aflições e sonda o meu íntimo. Derrama a Tua paz e a Tua direção sobre a minha vida. Em nome de Jesus, amém.`,
+            practicalStep: `Medite neste versículo ao longo do dia e declare a provisão e a paz de Deus sobre a sua casa.`,
+            alternativePassages: [],
+          };
+        }
+      }
+    }
+
+    // 2.D: Busca Textual Completa com Stemmer, Stopwords e Sinônimos (~31.000 versículos)
+    if (!candidateResponse) {
+      const textMatches = searchBibleFullText(query, version, 25);
+      for (const tm of textMatches) {
+        const fullResp = buildFullTextSearchResponse(tm, version);
+        if (fullResp && !isExcluded(fullResp.passage.reference)) {
+          candidateResponse = fullResp;
+          break;
+        }
+      }
+    }
+
+    // 2.E: Busca na Versão Alternativa se ainda não encontrou em modo busca
     if (!candidateResponse && mode === "search") {
       const altVersion = version === "nvi" ? "aa" : "nvi";
-      const altMatches = searchBibleFullText(query, altVersion, 1);
-      if (altMatches.length > 0) {
-        const m = altMatches[0];
+      const altMatches = searchBibleFullText(query, altVersion, 25);
+      for (const m of altMatches) {
         const p = getPassage(m.book, m.chapter, m.verse, m.verse, version);
-        if (p) {
+        if (p && !isExcluded(p.reference)) {
           candidateResponse = {
             success: true,
             isAiGenerated: false,
@@ -119,35 +172,28 @@ export async function POST(req: NextRequest) {
             practicalStep: `Abra o capítulo completo de ${m.book} ${m.chapter} para aprofundar seu entendimento.`,
             alternativePassages: [],
           };
+          break;
         }
       }
     }
 
-    // 2.E: Segunda chance temática
+    // 2.F: Fallback Diverso (Garantia de que NUNCA repete uma passagem já vista)
     if (!candidateResponse) {
-      const theme = matchThemeByText(query);
-      if (theme) {
-        candidateResponse = buildThematicResponse(theme, version) as ResolvedBibleResponse;
-      }
-    }
-
-    // 2.F: Fallback diverso (NUNCA fica em loop no Salmo 23)
-    if (!candidateResponse) {
-      candidateResponse = getDiverseComfortFallback(version);
+      candidateResponse = getDiverseComfortFallback(version, excludeRefs);
     }
 
     // Garante que o retorno sempre tenha passagens alternativas enriquecidas e sem repetição
     if (!candidateResponse.alternativePassages || candidateResponse.alternativePassages.length === 0) {
       candidateResponse.alternativePassages = getMorePassagesForContext({
         context: query,
-        themeId: (candidateResponse as any).themeId,
-        excludeReferences: [candidateResponse.passage.reference, ...(body.excludeReferences || [])],
+        themeId: (candidateResponse as any).themeId || theme?.id,
+        excludeReferences: [candidateResponse.passage.reference, ...excludeRefs],
         version,
         limit: 3,
       });
     }
 
-    // Se NÃO houver chave do Gemini configurada no servidor, entrega a resposta imediata
+    // Se NÃO houver chave do Gemini configurada no servidor, entrega a resposta determinística enriquecida
     if (!apiKey) {
       return NextResponse.json(candidateResponse);
     }
