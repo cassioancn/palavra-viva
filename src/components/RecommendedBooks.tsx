@@ -20,7 +20,7 @@ const THEME_BOOK_MAP: Record<string, BookRecommendation[]> = {
       description: "Descubra como trocar o desespero e a inquietação pela paz sobrenatural prometida por Deus.",
       category: "Cura Emocional",
       amazonQuery: "Ansiedade+Max+Lucado",
-      coverEmoji: "🕊️",
+      coverEmoji: "🌿",
     },
     {
       title: "Bíblia de Estudo NVI (Capa Luxo)",

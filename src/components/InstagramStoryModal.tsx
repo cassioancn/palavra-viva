@@ -91,7 +91,7 @@ export function InstagramStoryModal({
         await navigator.share({
           files: [file],
           title: `Palavra Viva — ${reference}`,
-          text: `"${text}" — ${reference} (${version})\n\nEncontre paz na Palavra de Deus:\nhttps://palavra-viva.novo-dia.workers.dev`,
+          text: `"${text}" — ${reference} (${version})\n\nEncontre paz na Palavra de Deus:\nhttps://palavra-viva.cassio-contra.workers.dev`,
         });
       } else {
         handleDownload();
@@ -105,9 +105,9 @@ export function InstagramStoryModal({
   };
 
   const handleCopyCaption = async () => {
-    const caption = `🕊️ "${text}"\n\n📖 ${reference} (${version})${
+    const caption = `✝️ "${text}"\n\n📖 ${reference} (${version})${
       themeTitle ? ` • ${themeTitle}` : ""
-    }\n\nEncontre consolo e direção na Palavra de Deus:\n🔗 https://palavra-viva.novo-dia.workers.dev\n\n#palavraviva #bibliasagrada #versiculododia #fe #deus #jesus #esperanca`;
+    }\n\nEncontre consolo e direção na Palavra de Deus:\n🔗 https://palavra-viva.cassio-contra.workers.dev\n\n#palavraviva #bibliasagrada #versiculododia #fe #deus #jesus #esperanca`;
 
     try {
       await navigator.clipboard.writeText(caption);

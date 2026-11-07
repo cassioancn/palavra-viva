@@ -2,6 +2,7 @@
 
 import React from "react";
 import { SlidersHorizontal, Heart } from "lucide-react";
+import { BrandLogo } from "./BrandLogo";
 
 interface HeaderProps {
   version: "nvi" | "aa";
@@ -15,8 +16,8 @@ export function Header({ version, onOpenSettings, onOpenPix }: HeaderProps) {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Logo & Brand */}
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sacred-400 to-sacred-600 flex items-center justify-center shadow-glow text-sanctuary-950 font-bold text-lg select-none">
-            🕊️
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sacred-400 via-sacred-500 to-sacred-600 flex items-center justify-center shadow-glow text-sanctuary-950 select-none">
+            <BrandLogo className="w-5 h-5 text-sanctuary-950" />
           </div>
           <div>
             <div className="flex items-center gap-2">

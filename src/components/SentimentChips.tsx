@@ -42,7 +42,7 @@ export const POPULAR_SENTIMENTS: SentimentOption[] = [
   },
   {
     id: "perdao_magoa",
-    emoji: "🕊️",
+    emoji: "🌿",
     label: "Preciso Perdoar",
     query: "Fui magoado e traído profundamente, preciso de força para liberar o perdão e ter paz.",
   },

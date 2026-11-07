@@ -85,7 +85,7 @@ export function VerseCard({
 
   const handleCopy = async () => {
     try {
-      const textToCopy = `"${fullText}"\n\n— ${reference} (${version})\nPalavra Viva 🕊️`;
+      const textToCopy = `"${fullText}"\n\n— ${reference} (${version})\nPalavra Viva ✝️`;
       await navigator.clipboard.writeText(textToCopy);
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
@@ -95,7 +95,7 @@ export function VerseCard({
   };
 
   const handleShareWhatsApp = () => {
-    const message = `🕊️ *Palavra Viva para o seu coração*\n\n"${fullText}"\n\n📖 *${reference} (${version})*\n_${themeTitle}_\n\nEncontre consolo na Palavra de Deus:\nhttps://palavra-viva.cassio-contra.workers.dev`;
+    const message = `✝️ *Palavra Viva para o seu coração*\n\n"${fullText}"\n\n📖 *${reference} (${version})*\n_${themeTitle}_\n\nEncontre consolo na Palavra de Deus:\nhttps://palavra-viva.cassio-contra.workers.dev`;
     const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(
       message
     )}`;
