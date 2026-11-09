@@ -117,6 +117,19 @@ export default function RootLayout({
             strategy="afterInteractive"
           />
         )}
+
+        {/* Infolinks Ads */}
+        <Script id="infolinks-config" strategy="lazyOnload">
+          {`
+            var infolinks_pid = 3449438;
+            var infolinks_wsid = 0;
+          `}
+        </Script>
+        <Script
+          id="infolinks-main"
+          src="//resources.infolinks.com/js/infolinks_main.js"
+          strategy="lazyOnload"
+        />
       </body>
     </html>
   );
