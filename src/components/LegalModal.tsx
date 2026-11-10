@@ -227,10 +227,10 @@ export function LegalModal({
 
               <div className="space-y-2">
                 <h4 className="font-semibold text-slate-100 text-sm">
-                  5. Programa de Associados Amazon & Parcerias
+                  5. Programas de Afiliados, Amazon & Hotmart
                 </h4>
                 <p>
-                  O site <strong>Palavra Viva</strong> participa do <strong>Programa de Associados da Amazon</strong>, um programa de afiliados projetado para proporcionar um meio para que sites ganhem remuneração veiculando links para a Amazon.com.br. Na qualidade de Associado da Amazon, recebemos remuneração por compras qualificadas efetuadas através dos links recomendados, sem nenhum acréscimo de valor ou custo para o comprador.
+                  O site <strong>Palavra Viva</strong> participa de programas de afiliados idôneos, incluindo o <strong>Programa de Associados da Amazon</strong> e a plataforma <strong>Hotmart</strong>. Esses programas nos permitem recomendar leituras cristãs edificantes (livros físicos, Bíblias e e-books digitais) e receber pequenas comissões por compras qualificadas, sem nenhum acréscimo de custo para o leitor. As transações são processadas com segurança nas plataformas oficiais dos produtores.
                 </p>
               </div>
             </div>

@@ -32,3 +32,31 @@ export const AMAZON_ASSOCIATE_TAG =
 
 export const AMAZON_DISCLOSURE =
   "Na qualidade de Associado da Amazon, eu recebo por compras qualificadas.";
+
+export const HOTMART_PARTNERS = [
+  {
+    id: "entrevista-com-jesus",
+    title: "Entrevista com JESUS",
+    author: "Marcos Costa",
+    category: "Perdão & Esperança",
+    coverEmoji: "✝️",
+    coverUrl:
+      "https://hotmart.s3.amazonaws.com/product_pictures/16311ce5-06db-489b-9ebc-7e12e5215f6f/capaebookEntrevistaComJESUS.png",
+    description:
+      "Como perdoar quando tudo em você grita por vingança? Uma jornada emocionante sobre cura interior, perdão e reencontro com o Mestre.",
+    url: "https://go.hotmart.com/U108418660C",
+    highlight: "História Transformadora",
+  },
+  {
+    id: "meditacoes-com-jesus",
+    title: "Meditações com JESUS",
+    author: "Vinicius Leandro",
+    category: "Oração & Vida Devocional",
+    coverEmoji: "🕊️",
+    coverUrl: "",
+    description:
+      "Aprenda a vencer a incerteza do coração e a contemplar as promessas vivas de Deus diariamente através da meditação bíblica guiada.",
+    url: "https://go.hotmart.com/O108418638G",
+    highlight: "Devocional Diário",
+  },
+];

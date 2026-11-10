@@ -9,6 +9,7 @@ import { ChapterModal } from "@/components/ChapterModal";
 import { SettingsModal } from "@/components/SettingsModal";
 import { PixDonationModal } from "@/components/PixDonationModal";
 import { RecommendedBooks } from "@/components/RecommendedBooks";
+import { HotmartFeaturedSection } from "@/components/HotmartFeaturedSection";
 import { AdBanner } from "@/components/AdBanner";
 import { Footer } from "@/components/Footer";
 import { LegalModal, type LegalTab } from "@/components/LegalModal";
@@ -611,6 +612,9 @@ export default function HomePage() {
                 onFetchMorePassages={handleFetchMorePassages}
                 isLoadingMore={isLoadingMore}
               />
+
+              {/* Bloco de Destaque Hotmart: E-books Cristãos Recomendados */}
+              <HotmartFeaturedSection />
 
               {/* Bloco de Monetização 1: Recomendações de Bíblias & Livros na Amazon */}
               <RecommendedBooks themeId={result.themeId} />
