@@ -26,3 +26,9 @@ export const PIX_RECIPIENT =
 
 export const CVV_PHONE = "188";
 export const CVV_URL = "https://cvv.org.br";
+
+export const AMAZON_ASSOCIATE_TAG =
+  process.env.NEXT_PUBLIC_AMAZON_TAG || "palavraviva01-20";
+
+export const AMAZON_DISCLOSURE =
+  "Na qualidade de Associado da Amazon, eu recebo por compras qualificadas.";

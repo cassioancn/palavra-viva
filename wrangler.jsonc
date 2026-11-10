@@ -15,6 +15,7 @@
   },
   "vars": {
     "NEXT_PUBLIC_SITE_URL": "https://palavra-vivallm.com.br",
-    "NEXT_PUBLIC_CONTACT_EMAIL": "contato@palavra-vivallm.com.br"
+    "NEXT_PUBLIC_CONTACT_EMAIL": "contato@palavra-vivallm.com.br",
+    "NEXT_PUBLIC_AMAZON_TAG": "palavraviva01-20"
   }
 }

@@ -224,6 +224,15 @@ export function LegalModal({
                   Todas as contribuições via Pix são ofertas espontâneas destinadas exclusivamente à manutenção de servidores, domínios e ampliação da mensagem do Evangelho, sem constituir relação contratual de prestação de serviços.
                 </p>
               </div>
+
+              <div className="space-y-2">
+                <h4 className="font-semibold text-slate-100 text-sm">
+                  5. Programa de Associados Amazon & Parcerias
+                </h4>
+                <p>
+                  O site <strong>Palavra Viva</strong> participa do <strong>Programa de Associados da Amazon</strong>, um programa de afiliados projetado para proporcionar um meio para que sites ganhem remuneração veiculando links para a Amazon.com.br. Na qualidade de Associado da Amazon, recebemos remuneração por compras qualificadas efetuadas através dos links recomendados, sem nenhum acréscimo de valor ou custo para o comprador.
+                </p>
+              </div>
             </div>
           )}
         </div>
