@@ -1,16 +1,22 @@
 "use client";
 
 import React from "react";
-import { SlidersHorizontal, Heart } from "lucide-react";
+import { SlidersHorizontal, Heart, Sparkles } from "lucide-react";
 import { BrandLogo } from "./BrandLogo";
 
 interface HeaderProps {
   version: "nvi" | "aa";
   onOpenSettings: () => void;
   onOpenPix: () => void;
+  onOpenDailyVerse?: () => void;
 }
 
-export function Header({ version, onOpenSettings, onOpenPix }: HeaderProps) {
+export function Header({
+  version,
+  onOpenSettings,
+  onOpenPix,
+  onOpenDailyVerse,
+}: HeaderProps) {
   return (
     <header className="w-full border-b border-sanctuary-700/60 bg-sanctuary-900/60 backdrop-blur-md sticky top-0 z-30 transition-all">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
@@ -36,6 +42,18 @@ export function Header({ version, onOpenSettings, onOpenPix }: HeaderProps) {
 
         {/* Action Controls */}
         <div className="flex items-center gap-2">
+          {/* Botão Versículo do Dia */}
+          {onOpenDailyVerse && (
+            <button
+              onClick={onOpenDailyVerse}
+              className="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-amber-300 hover:text-amber-200 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 px-3 py-1.5 rounded-lg transition-all shadow-sm active:scale-95"
+              title="Abrir o Versículo do Dia"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span className="hidden sm:inline">Palavra do Dia</span>
+            </button>
+          )}
+
           {/* Botão de Apoio via Pix */}
           <button
             onClick={onOpenPix}

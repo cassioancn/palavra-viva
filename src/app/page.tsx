@@ -14,6 +14,8 @@ import { Footer } from "@/components/Footer";
 import { LegalModal, type LegalTab } from "@/components/LegalModal";
 import { ContactModal } from "@/components/ContactModal";
 import { MobileStickyBar } from "@/components/MobileStickyBar";
+import { DailyVerseModal } from "@/components/DailyVerseModal";
+import type { DailyVerseResult } from "@/lib/dailyVerse";
 import {
   Sparkles,
   Send,
@@ -41,6 +43,8 @@ export default function HomePage() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isPixOpen, setIsPixOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isDailyVerseOpen, setIsDailyVerseOpen] = useState(false);
+  const [dailyVerse, setDailyVerse] = useState<DailyVerseResult | null>(null);
   const [legalModal, setLegalModal] = useState<{
     isOpen: boolean;
     tab: LegalTab;
@@ -79,6 +83,44 @@ export default function HomePage() {
       }
     }
   }, []);
+
+  // Busca a Passagem do Dia e abre o pop-up elegante na primeira visita do dia
+  useEffect(() => {
+    let isMounted = true;
+    let timer: NodeJS.Timeout | null = null;
+
+    const loadDailyVerse = async () => {
+      try {
+        const res = await fetch(`/api/daily-verse?version=${version}`);
+        const data = await res.json();
+        if (data && data.success && isMounted) {
+          setDailyVerse(data);
+
+          // Verifica se o usuário optou por não ver mais hoje
+          const isDismissed =
+            typeof window !== "undefined" &&
+            localStorage.getItem(`pv_votd_dismissed_${data.dateKey}`);
+
+          if (!isDismissed) {
+            timer = setTimeout(() => {
+              if (isMounted) {
+                setIsDailyVerseOpen(true);
+              }
+            }, 800);
+          }
+        }
+      } catch (err) {
+        console.error("Erro ao carregar versículo do dia:", err);
+      }
+    };
+
+    loadDailyVerse();
+
+    return () => {
+      isMounted = false;
+      if (timer) clearTimeout(timer);
+    };
+  }, [version]);
 
   const handleSaveSettings = (newVersion: "nvi" | "aa") => {
     setVersion(newVersion);
@@ -348,6 +390,7 @@ export default function HomePage() {
         version={version}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenPix={() => setIsPixOpen(true)}
+        onOpenDailyVerse={() => setIsDailyVerseOpen(true)}
       />
 
       <main className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-12 flex flex-col gap-8">
@@ -388,11 +431,27 @@ export default function HomePage() {
 
         {/* Hero Section */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sacred-500/10 text-sacred-300 border border-sacred-500/20">
-            <Sparkles className="w-3.5 h-3.5 text-sacred-400" />
-            {searchMode === "search"
-              ? "Localizador de Narrativas e Versículos Bíblicos"
-              : "Consolo Autêntico • 100% Livre de Alucinações"}
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sacred-500/10 text-sacred-300 border border-sacred-500/20">
+              <Sparkles className="w-3.5 h-3.5 text-sacred-400" />
+              {searchMode === "search"
+                ? "Localizador de Narrativas e Versículos Bíblicos"
+                : "Consolo Autêntico • 100% Livre de Alucinações"}
+            </div>
+
+            {dailyVerse && (
+              <button
+                type="button"
+                onClick={() => setIsDailyVerseOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/35 transition-all hover:scale-105 active:scale-95 shadow-sm"
+                title="Abrir o Versículo do Dia"
+              >
+                <span>✨ Palavra de Hoje:</span>
+                <strong className="text-amber-200 underline decoration-amber-400/50">
+                  {dailyVerse.reference}
+                </strong>
+              </button>
+            )}
           </div>
 
           <h1 className="font-cinzel text-3xl sm:text-5xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-sacred-200 via-sacred-400 to-sacred-200">
@@ -627,6 +686,15 @@ export default function HomePage() {
       <PixDonationModal
         isOpen={isPixOpen}
         onClose={() => setIsPixOpen(false)}
+      />
+
+      {/* Pop-up Elegante da Passagem do Dia (Formato Social Story) */}
+      <DailyVerseModal
+        isOpen={isDailyVerseOpen}
+        onClose={() => setIsDailyVerseOpen(false)}
+        data={dailyVerse}
+        onOpenChapter={handleOpenChapter}
+        version={version}
       />
     </>
   );
