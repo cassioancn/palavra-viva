@@ -625,30 +625,69 @@ const CALENDAR_366_PASSAGES: DailyVerseItem[] = [
 ];
 
 /**
- * Calcula o dia do ano (1 a 366) para uma data dada
+ * Retorna ano, mês (1..12) e dia (1..31) no fuso horário de Brasília (America/Sao_Paulo)
  */
-export function getDayOfYear(date: Date): number {
-  const start = new Date(date.getFullYear(), 0, 0);
-  const diff =
-    date.getTime() -
-    start.getTime() +
-    (start.getTimezoneOffset() - date.getTimezoneOffset()) * 60 * 1000;
-  const oneDay = 1000 * 60 * 60 * 24;
-  return Math.floor(diff / oneDay);
+export function getBrazilDateParts(date: Date = new Date()): {
+  year: number;
+  month: number;
+  day: number;
+} {
+  try {
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Sao_Paulo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+    const parts = formatter.formatToParts(date);
+    const year = Number(parts.find((p) => p.type === "year")?.value);
+    const month = Number(parts.find((p) => p.type === "month")?.value);
+    const day = Number(parts.find((p) => p.type === "day")?.value);
+    if (year && month && day) {
+      return { year, month, day };
+    }
+  } catch {
+    // Fallback manual para UTC-3 (Brasília)
+  }
+
+  const utcMinus3 = new Date(date.getTime() - 3 * 60 * 60 * 1000);
+  return {
+    year: utcMinus3.getUTCFullYear(),
+    month: utcMinus3.getUTCMonth() + 1,
+    day: utcMinus3.getUTCDate(),
+  };
 }
 
 /**
- * Retorna o versículo oficial do dia, 100% determinístico e com relacionamento temático de datas
+ * Calcula o dia do ano (1 a 366) a partir de ano, mês e dia sem depender de timezone local
  */
-export function getVerseOfTheDay(
-  date: Date = new Date(),
+export function getDayOfYearUTC(year: number, month: number, day: number): number {
+  const start = Date.UTC(year, 0, 0, 12, 0, 0);
+  const current = Date.UTC(year, month - 1, day, 12, 0, 0);
+  const oneDay = 1000 * 60 * 60 * 24;
+  return Math.round((current - start) / oneDay);
+}
+
+/**
+ * Calcula o dia do ano (1 a 366) para uma data dada
+ */
+export function getDayOfYear(date: Date): number {
+  return getDayOfYearUTC(date.getFullYear(), date.getMonth() + 1, date.getDate());
+}
+
+/**
+ * Retorna o versículo oficial para um dia específico (year, month 1..12, day 1..31),
+ * 100% imune a fuso horário do servidor (UTC).
+ */
+export function getVerseOfTheDayByParts(
+  year: number,
+  monthNum: number,
+  dayNum: number,
   version: "nvi" | "aa" = "nvi"
 ): DailyVerseResult {
-  // Ajuste do dia e mês
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(monthNum).padStart(2, "0");
+  const day = String(dayNum).padStart(2, "0");
   const monthDayKey = `${month}-${day}`;
-  const year = date.getFullYear();
   const dateKey = `${year}-${monthDayKey}`;
 
   // 1. Verifica se hoje é uma data especial comemorativa
@@ -657,7 +696,7 @@ export function getVerseOfTheDay(
     item = SPECIAL_DATES_MAP[monthDayKey];
   } else {
     // 2. Mapeamento cíclico dos 366 versículos
-    const dayOfYear = getDayOfYear(date);
+    const dayOfYear = getDayOfYearUTC(year, monthNum, dayNum);
     const index = Math.abs((dayOfYear - 1) % CALENDAR_366_PASSAGES.length);
     item = CALENDAR_366_PASSAGES[index];
   }
@@ -680,7 +719,7 @@ export function getVerseOfTheDay(
       ? `${item.book} ${item.chapter}:${item.startVerse}`
       : `${item.book} ${item.chapter}:${item.startVerse}-${item.endVerse}`;
 
-  // Formata a data em português
+  // Formata a data em português usando meio-dia UTC para evitar troca de dia por fuso
   const dayNames = [
     "Domingo",
     "Segunda-feira",
@@ -705,8 +744,9 @@ export function getVerseOfTheDay(
     "Dezembro",
   ];
 
-  const dayOfWeek = dayNames[date.getDay()];
-  const formattedDate = `${date.getDate()} de ${monthNames[date.getMonth()]}`;
+  const utcMidday = new Date(Date.UTC(year, monthNum - 1, dayNum, 12, 0, 0));
+  const dayOfWeek = dayNames[utcMidday.getUTCDay()];
+  const formattedDate = `${dayNum} de ${monthNames[monthNum - 1]}`;
 
   return {
     dateKey,
@@ -724,4 +764,15 @@ export function getVerseOfTheDay(
     reflection: item.reflection,
     prayer: item.prayer,
   };
+}
+
+/**
+ * Retorna o versículo oficial do dia usando fuso horário do Brasil por padrão
+ */
+export function getVerseOfTheDay(
+  date: Date = new Date(),
+  version: "nvi" | "aa" = "nvi"
+): DailyVerseResult {
+  const { year, month, day } = getBrazilDateParts(date);
+  return getVerseOfTheDayByParts(year, month, day, version);
 }

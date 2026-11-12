@@ -92,7 +92,9 @@ export default function HomePage() {
 
     const loadDailyVerse = async () => {
       try {
-        const res = await fetch(`/api/daily-verse?version=${version}`);
+        const now = new Date();
+        const localDateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+        const res = await fetch(`/api/daily-verse?version=${version}&date=${localDateStr}`);
         const data = await res.json();
         if (data && data.success && isMounted) {
           setDailyVerse(data);
