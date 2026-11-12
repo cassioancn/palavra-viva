@@ -126,16 +126,31 @@ export async function POST(req: NextRequest) {
         const m = morePassages[0];
         const p = getPassage(m.book, m.chapter, m.startVerse, m.endVerse, version);
         if (p && !isExcluded(p.reference)) {
+          const activeThemeId = theme?.id || body.themeId;
+          const isPositiveTheme = [
+            "gratidao_louvor",
+            "alegria_felicidade",
+            "vitoria_conquista",
+            "paz_serenidade",
+            "amor_familia",
+          ].includes(activeThemeId || "");
+
           candidateResponse = {
             success: true,
             isAiGenerated: false,
-            themeId: theme?.id || body.themeId,
+            themeId: activeThemeId,
             themeTitle: m.note || theme?.title || `Passagem em ${m.book}`,
             passage: p,
-            pastoralReflection: `Ao nos voltarmos para ${p.reference}, encontramos o amparo fiel das Sagradas Escrituras. A graça de Deus é suficiente para cada estação da vida e Suas promessas de paz permanecem firmes para o seu coração hoje.`,
+            pastoralReflection: isPositiveTheme
+              ? `Ao nos voltarmos para ${p.reference}, celebramos a bondade e a fidelidade do Senhor. Toda boa dádiva vem do alto, e render graças a Deus fortalece a alegria e a paz em nossa caminhada.`
+              : `Ao nos voltarmos para ${p.reference}, encontramos o amparo fiel das Sagradas Escrituras. A graça de Deus é suficiente para cada estação da vida e Suas promessas de paz permanecem firmes para o seu coração hoje.`,
             historicalContext: `Texto canônico das Sagradas Escrituras registrado no livro de ${m.book}, capítulo ${m.chapter}, transmitindo ensinamentos eternos de fé.`,
-            guidedPrayer: `Senhor Deus, achego-me a Ti amparado em ${p.reference}. Sei que o Senhor conhece as minhas aflições e sonda o meu íntimo. Derrama a Tua paz e a Tua direção sobre a minha vida. Em nome de Jesus, amém.`,
-            practicalStep: `Medite neste versículo ao longo do dia e declare a provisão e a paz de Deus sobre a sua casa.`,
+            guidedPrayer: isPositiveTheme
+              ? `Senhor Deus, meu coração transborda em gratidão e louvor diante de ${p.reference}. Obrigado por Tua bondade, fidelidade e bênçãos derramadas sobre mim e minha família. Em nome de Jesus, amém.`
+              : `Senhor Deus, achego-me a Ti amparado em ${p.reference}. Sei que o Senhor conhece as minhas aflições e sonda o meu íntimo. Derrama a Tua paz e a Tua direção sobre a minha vida. Em nome de Jesus, amém.`,
+            practicalStep: isPositiveTheme
+              ? `Compartilhe hoje uma palavra de gratidão ou bênção com alguém especial e agradeça a Deus por cada detalhe desta conquista.`
+              : `Medite neste versículo ao longo do dia e declare a provisão e a paz de Deus sobre a sua casa.`,
             alternativePassages: [],
           };
         }

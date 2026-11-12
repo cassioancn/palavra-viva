@@ -6,15 +6,85 @@ export interface SentimentOption {
   id: string;
   emoji: string;
   label: string;
+  tone?: "positive" | "comfort";
   query: string;
   queries: string[];
 }
 
 export const POPULAR_SENTIMENTS: SentimentOption[] = [
+  // Sentimentos Positivos: Agradecer, Celebrar & Sentir-se Feliz
+  {
+    id: "gratidao_louvor",
+    emoji: "🙌",
+    label: "Gratidão & Louvor",
+    tone: "positive",
+    query: "Quero agradecer a Deus por tantas bênçãos, vitórias e pelo Seu amor fiel na minha vida.",
+    queries: [
+      "Quero agradecer a Deus por tantas bênçãos, vitórias e pelo Seu amor fiel na minha vida.",
+      "Meu coração transborda de gratidão pelas portas que o Senhor abriu para mim.",
+      "Hoje eu só quero louvar e bendizer o nome do Senhor por Sua infinita bondade.",
+      "Celebro os livramentos e a fidelidade de Deus em cada detalhe da minha jornada.",
+    ],
+  },
+  {
+    id: "alegria_felicidade",
+    emoji: "😊",
+    label: "Alegria & Felicidade",
+    tone: "positive",
+    query: "Estou me sentindo muito feliz hoje e quero celebrar essa alegria na presença de Deus.",
+    queries: [
+      "Estou me sentindo muito feliz hoje e quero celebrar essa alegria na presença de Deus.",
+      "Meu coração está radiante e cheio de júbilo pelas boas notícias que recebi.",
+      "Quero meditar em versículos bíblicos de alegria e regozijo pelo dia maravilhoso que estou vivendo.",
+      "Estou muito contente e quero manter a verdadeira alegria do Senhor transbordando em mim.",
+    ],
+  },
+  {
+    id: "vitoria_conquista",
+    emoji: "🏆",
+    label: "Vitória & Conquista",
+    tone: "positive",
+    query: "Conquistei uma vitória importante e quero dedicar esse triunfo e honra a Deus.",
+    queries: [
+      "Conquistei uma vitória importante e quero dedicar esse triunfo e honra a Deus.",
+      "Deus abriu uma grande porta na minha vida e quero celebrar essa conquista com a Palavra.",
+      "Venci uma etapa difícil e reconheço que foi a mão poderosa do Senhor que me deu vitória.",
+      "Estou realizado com uma bênção alcançada e quero agradecer ao Deus dos Exércitos.",
+    ],
+  },
+  {
+    id: "paz_serenidade",
+    emoji: "🕊️",
+    label: "Paz & Serenidade",
+    tone: "positive",
+    query: "Sinto uma paz maravilhosa no coração hoje e quero meditar na tranquilidade de Deus.",
+    queries: [
+      "Sinto uma paz maravilhosa no coração hoje e quero meditar na tranquilidade de Deus.",
+      "Meu espírito está sereno, leve e descansado nos braços do Senhor.",
+      "Quero ler passagens bíblicas sobre paz interior, calma e harmonia em Cristo.",
+      "Estou vivendo um momento de serenidade e quero nutrir essa calmaria santa na alma.",
+    ],
+  },
+  {
+    id: "amor_familia",
+    emoji: "❤️",
+    label: "Amor & Família",
+    tone: "positive",
+    query: "Quero abençoar minha família, meu casamento e celebrar o amor que Deus nos deu.",
+    queries: [
+      "Quero abençoar minha família, meu casamento e celebrar o amor que Deus nos deu.",
+      "Sinto o coração cheio de amor pelas pessoas queridas ao meu redor e quero orar pelo meu lar.",
+      "Quero versículos sobre o amor verdadeiro, união familiar e bênçãos sobre a nossa casa.",
+      "Sou muito grato pela minha família e peço a Deus que continue fortalecendo nossos laços.",
+    ],
+  },
+
+  // Sentimentos de Consolo, Busca & Direção
   {
     id: "ansiedade_futuro",
     emoji: "😰",
     label: "Ansiedade & Medo",
+    tone: "comfort",
     query: "Estou me sentindo muito ansioso, com medo do futuro e com o peito apertado.",
     queries: [
       "Estou me sentindo muito ansioso, com medo do futuro e com o peito apertado.",
@@ -27,6 +97,7 @@ export const POPULAR_SENTIMENTS: SentimentOption[] = [
     id: "luto_tristeza_perda",
     emoji: "💔",
     label: "Luto & Saudade",
+    tone: "comfort",
     query: "Perdi alguém muito importante e sinto uma dor imensa de saudade e tristeza.",
     queries: [
       "Perdi alguém muito importante e sinto uma dor imensa de saudade e tristeza.",
@@ -39,6 +110,7 @@ export const POPULAR_SENTIMENTS: SentimentOption[] = [
     id: "cansaco_esgotamento",
     emoji: "🔋",
     label: "Cansaço & Exaustão",
+    tone: "comfort",
     query: "Estou esgotado e sobrecarregado, sinto que não tenho mais forças para continuar.",
     queries: [
       "Estou esgotado e sobrecarregado, sinto que não tenho mais forças para continuar.",
@@ -51,6 +123,7 @@ export const POPULAR_SENTIMENTS: SentimentOption[] = [
     id: "solidao_abandono",
     emoji: "🍂",
     label: "Solidão & Abandono",
+    tone: "comfort",
     query: "Estou me sentindo sozinho, abandonado e incompreendido pelas pessoas ao meu redor.",
     queries: [
       "Estou me sentindo sozinho, abandonado e incompreendido pelas pessoas ao meu redor.",
@@ -60,21 +133,10 @@ export const POPULAR_SENTIMENTS: SentimentOption[] = [
     ],
   },
   {
-    id: "gratidao_louvor",
-    emoji: "🙌",
-    label: "Gratidão & Louvor",
-    query: "Quero agradecer a Deus por tantas bênçãos, vitórias e pelo Seu amor fiel na minha vida.",
-    queries: [
-      "Quero agradecer a Deus por tantas bênçãos, vitórias e pelo Seu amor fiel na minha vida.",
-      "Meu coração transborda de gratidão pelas portas que o Senhor abriu para mim.",
-      "Hoje eu só quero louvar e bendizer o nome do Senhor por Sua infinita bondade.",
-      "Celebro os livramentos e a fidelidade de Deus em cada detalhe da minha jornada.",
-    ],
-  },
-  {
     id: "perdao_magoa",
     emoji: "🌿",
     label: "Preciso Perdoar",
+    tone: "comfort",
     query: "Fui magoado e traído profundamente, preciso de força para liberar o perdão e ter paz.",
     queries: [
       "Fui magoado e traído profundamente, preciso de força para liberar o perdão e ter paz.",
@@ -87,6 +149,7 @@ export const POPULAR_SENTIMENTS: SentimentOption[] = [
     id: "culpa_arrependimento",
     emoji: "😔",
     label: "Culpa & Perdão",
+    tone: "comfort",
     query: "Errei e me sinto indigno e com vergonha. Preciso do perdão e da misericórdia de Deus.",
     queries: [
       "Errei e me sinto indigno e com vergonha. Preciso do perdão e da misericórdia de Deus.",
@@ -99,6 +162,7 @@ export const POPULAR_SENTIMENTS: SentimentOption[] = [
     id: "sabedoria_direcao",
     emoji: "🧭",
     label: "Dúvida & Decisão",
+    tone: "comfort",
     query: "Estou diante de uma encruzilhada e preciso de sabedoria divina para tomar a decisão certa.",
     queries: [
       "Estou diante de uma encruzilhada e preciso de sabedoria divina para tomar a decisão certa.",
@@ -111,6 +175,7 @@ export const POPULAR_SENTIMENTS: SentimentOption[] = [
     id: "enfermidade_cura",
     emoji: "🩹",
     label: "Enfermidade & Dor",
+    tone: "comfort",
     query: "Estou enfrentando uma doença e peço a Deus cura, renovação de forças e alívio para o meu corpo.",
     queries: [
       "Estou enfrentando uma doença e peço a Deus cura, renovação de forças e alívio para o meu corpo.",
@@ -123,6 +188,7 @@ export const POPULAR_SENTIMENTS: SentimentOption[] = [
     id: "financeiro_provisao",
     emoji: "🌾",
     label: "Finanças & Provisão",
+    tone: "comfort",
     query: "As contas estão apertadas e estou preocupado com o sustento da minha família.",
     queries: [
       "As contas estão apertadas e estou preocupado com o sustento da minha família.",
@@ -135,6 +201,7 @@ export const POPULAR_SENTIMENTS: SentimentOption[] = [
     id: "fe_esperanca_desanimo",
     emoji: "🔥",
     label: "Crise de Fé & Esperança",
+    tone: "comfort",
     query: "Minha fé está fraca e sinto vontade de desistir. Preciso que Deus renove a minha esperança.",
     queries: [
       "Minha fé está fraca e sinto vontade de desistir. Preciso que Deus renove a minha esperança.",
@@ -221,10 +288,6 @@ export function SentimentChips({
 }: SentimentChipsProps) {
   const [clickCounts, setClickCounts] = useState<Record<string, number>>({});
   const isSearchMode = mode === "search";
-  const items = isSearchMode ? POPULAR_STORIES : POPULAR_SENTIMENTS;
-  const label = isSearchMode
-    ? "Histórias e Passagens Bíblicas Populares (Toque para ver):"
-    : "Como está o seu coração hoje? (Escolha rápida):";
 
   const handleClick = (item: SentimentOption) => {
     const count = clickCounts[item.id] || 0;
@@ -234,28 +297,87 @@ export function SentimentChips({
     onSelectSentiment(chosenQuery, item.id);
   };
 
+  if (isSearchMode) {
+    return (
+      <div className="w-full">
+        <div className="flex items-center justify-between mb-2.5">
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+            Histórias e Passagens Bíblicas Populares (Toque para ver):
+          </span>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {POPULAR_STORIES.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => handleClick(item)}
+              disabled={isLoading}
+              className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium bg-sanctuary-800/90 hover:bg-sanctuary-700/80 text-slate-300 hover:text-sacred-300 border border-sanctuary-600/70 hover:border-sacred-500/40 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+            >
+              <span className="text-sm transition-transform group-hover:scale-110">
+                {item.emoji}
+              </span>
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const positiveSentiments = POPULAR_SENTIMENTS.filter((s) => s.tone === "positive");
+  const comfortSentiments = POPULAR_SENTIMENTS.filter((s) => s.tone !== "positive");
+
   return (
-    <div className="w-full">
-      <div className="flex items-center justify-between mb-2.5">
-        <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-          {label}
-        </span>
+    <div className="w-full space-y-3.5">
+      {/* Sentimentos Positivos: Celebrar, Agradecer & Regozijar */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-300/90 flex items-center gap-1">
+            <span>✨ Para Agradecer, Celebrar & Alegrar o Coração:</span>
+          </span>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {positiveSentiments.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => handleClick(item)}
+              disabled={isLoading}
+              className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium bg-amber-500/10 hover:bg-amber-500/20 text-amber-200 hover:text-amber-100 border border-amber-500/30 hover:border-amber-400/60 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:pointer-events-none shadow-sm"
+            >
+              <span className="text-sm transition-transform group-hover:scale-110">
+                {item.emoji}
+              </span>
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {items.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => handleClick(item)}
-            disabled={isLoading}
-            className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium bg-sanctuary-800/90 hover:bg-sanctuary-700/80 text-slate-300 hover:text-sacred-300 border border-sanctuary-600/70 hover:border-sacred-500/40 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
-          >
-            <span className="text-sm transition-transform group-hover:scale-110">
-              {item.emoji}
-            </span>
-            <span>{item.label}</span>
-          </button>
-        ))}
+      {/* Sentimentos de Consolo, Força & Direção */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+            🌿 Para Buscar Consolo, Força & Direção:
+          </span>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {comfortSentiments.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => handleClick(item)}
+              disabled={isLoading}
+              className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium bg-sanctuary-800/90 hover:bg-sanctuary-700/80 text-slate-300 hover:text-sacred-300 border border-sanctuary-600/70 hover:border-sacred-500/40 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+            >
+              <span className="text-sm transition-transform group-hover:scale-110">
+                {item.emoji}
+              </span>
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

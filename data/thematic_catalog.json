@@ -232,6 +232,94 @@
         {"book": "Hebreus", "chapter": 11, "start_verse": 1, "end_verse": 1, "note": "A fé é a certeza daquilo que esperamos e a prova das coisas que não vemos"},
         {"book": "Salmos", "chapter": 42, "start_verse": 11, "end_verse": 11, "note": "Por que você está assim tão triste, ó minha alma? Ponha a sua esperança em Deus"}
       ]
+    },
+    {
+      "id": "alegria_felicidade",
+      "title": "Alegria, Felicidade e Regozijo no Senhor",
+      "keywords": ["feliz", "felicidade", "alegria", "alegre", "radiante", "contente", "sorriso", "jubilo", "regozijo", "contentamento", "dia maravilhoso", "entusiasmo", "euforia", "alegria do senhor"],
+      "primary_passage": {
+        "book": "Filipenses",
+        "chapter": 4,
+        "start_verse": 4,
+        "end_verse": 5,
+        "theme_title": "Alegrem-se Sempre no Senhor",
+        "context_summary": "O apóstolo Paulo ensina que a alegria cristã genuína não é uma emoção passageira subordinada ao acaso, mas um transbordar constante da presença e da bondade de Deus na alma.",
+        "reflection": "Que bênção sentir o coração leve e alegre! A Palavra nos convida a celebrar os dias felizes reconhecendo o Autor de toda boa dádiva. Quando a nossa alegria está enraizada no Senhor, ela deixa de ser frágil e se torna uma fonte poderosa de força e esperança que contagia todos ao nosso redor.",
+        "guided_prayer": "Pai celestial, obrigado por este dia alegre e pelo sorriso que colocaste em meu coração! Celebro a Tua bondade e peço que a alegria do Senhor continue sendo a minha força e o testemunho vivo do Teu amor através da minha vida. Que eu possa transbordar paz e gentileza para todos hoje. Em nome de Jesus, amém!",
+        "practical_step": "Compartilhe esse versículo com um amigo ou familiar hoje apenas para espalhar um pouco da sua alegria e encorajar o dia de alguém."
+      },
+      "alternative_passages": [
+        {"book": "Neemias", "chapter": 8, "start_verse": 10, "end_verse": 10, "note": "A alegria do Senhor é a nossa força"},
+        {"book": "Salmos", "chapter": 16, "start_verse": 11, "end_verse": 11, "note": "Na tua presença há plenitude de alegria"},
+        {"book": "João", "chapter": 15, "start_verse": 11, "end_verse": 11, "note": "Para que a minha alegria esteja em vocês e a alegria de vocês seja completa"},
+        {"book": "Salmos", "chapter": 126, "start_verse": 2, "end_verse": 3, "note": "Grandes coisas fez o Senhor por nós, por isso estamos alegres"}
+      ]
+    },
+    {
+      "id": "vitoria_conquista",
+      "title": "Vitória, Conquista e Realização em Deus",
+      "keywords": ["vitoria", "vencer", "vencedor", "conquista", "conquistar", "conquistei", "triunfo", "venci", "porta aberta", "realizado", "sucesso", "aprovado", "bencao alcancada", "superacao", "alcancei"],
+      "primary_passage": {
+        "book": "1 Coríntios",
+        "chapter": 15,
+        "start_verse": 57,
+        "end_verse": 58,
+        "theme_title": "Graças a Deus, que nos Dá a Vitória",
+        "context_summary": "Ao concluir seu grandioso capítulo sobre a ressurreição e a esperança eterna, o apóstolo Paulo irrompe em louvor, lembrando que todo triunfo verdadeiro procede da graça de Cristo.",
+        "reflection": "Cada conquista honesta, porta aberta ou etapa superada é motivo para glorificar a Deus. Ele honra o esforço diligente e abre caminhos que nenhum homem pode fechar. Receba esta vitória com humildade e gratidão, lembrando que o melhor de Deus ainda está por vir e que o seu trabalho no Senhor nunca é inútil.",
+        "guided_prayer": "Senhor dos Exércitos, dedico esta vitória e conquista inteiramente a Ti! Sei que não foi apenas pela minha força, mas pela Tua mão poderosa abrindo as portas e me sustentando até aqui. Conserva meu coração humilde, grato e sempre firme na Tua Palavra para os próximos passos. Em nome de Jesus, amém!",
+        "practical_step": "Ao celebrar sua vitória hoje, lembre-se de abençoar alguém com uma palavra de incentivo ou um gesto de generosidade."
+      },
+      "alternative_passages": [
+        {"book": "Romanos", "chapter": 8, "start_verse": 37, "end_verse": 37, "note": "Em todas estas coisas somos mais que vencedores, por meio daquele que nos amou"},
+        {"book": "Provérbios", "chapter": 16, "start_verse": 3, "end_verse": 3, "note": "Consagre ao Senhor tudo o que você faz, e os seus planos serão bem-sucedidos"},
+        {"book": "Salmos", "chapter": 118, "start_verse": 15, "end_verse": 16, "note": "A mão direita do Senhor age com poder e faz proezas"},
+        {"book": "Salmos", "chapter": 20, "start_verse": 4, "end_verse": 5, "note": "Que ele lhe conceda o desejo do seu coração e torne bem-sucedidos todos os seus planos"}
+      ]
+    },
+    {
+      "id": "paz_serenidade",
+      "title": "Paz Interior, Serenidade e Descanso em Cristo",
+      "keywords": ["paz", "sereno", "serenidade", "calma", "tranquilidade", "tranquilo", "leveza", "harmonia", "sossego", "descansado", "paz interior", "alivio", "plenitude"],
+      "primary_passage": {
+        "book": "João",
+        "chapter": 14,
+        "start_verse": 27,
+        "end_verse": 27,
+        "theme_title": "A Minha Paz Lhes Dou",
+        "context_summary": "Em sua despedida no cenáculo antes da cruz, Jesus deixa aos discípulos o Seu mais precioso legado interior: uma paz sobrenatural que o mundo agitado não pode fabricar nem arrancar.",
+        "reflection": "A serenidade que você experimenta quando descansa em Cristo vale mais do que todos os tesouros da terra. A paz de Jesus é um escudo silencioso para a alma: ela organiza os pensamentos, acalma as emoções e nos permite respirar fundo na certeza de que somos profundamente amados pelo Pai.",
+        "guided_prayer": "Jesus, Príncipe da Paz, agradeço por essa serenidade preciosa que envolve meu espírito. Preserva meu coração nessa calmaria santa, fortalece minha comunhão contigo e faz de mim um instrumento da Tua paz dentro do meu lar e por onde eu passar hoje. Amém!",
+        "practical_step": "Aproveite esse momento de calma para fazer uma leitura pausada de um Salmo e respirar profundamente, agradecendo por estar em paz com Deus."
+      },
+      "alternative_passages": [
+        {"book": "Isaías", "chapter": 26, "start_verse": 3, "end_verse": 3, "note": "Tu guardarás em perfeita paz aquele cujo propósito está firme, porque em ti confia"},
+        {"book": "Salmos", "chapter": 4, "start_verse": 8, "end_verse": 8, "note": "Em paz me deito e logo adormeço, pois só tu, Senhor, me fazes viver em segurança"},
+        {"book": "Salmos", "chapter": 29, "start_verse": 11, "end_verse": 11, "note": "O Senhor dá força ao seu povo; o Senhor dá a seu povo a bênção da paz"},
+        {"book": "Colossenses", "chapter": 3, "start_verse": 15, "end_verse": 15, "note": "Que a paz de Cristo seja o juiz em seu coração"}
+      ]
+    },
+    {
+      "id": "amor_familia",
+      "title": "Amor, União Familiar e Bênçãos sobre o Lar",
+      "keywords": ["amor", "familia", "lar", "casa", "casamento", "esposa", "marido", "filhos", "uniao", "queridos", "abencoar familia", "abraco", "carinho", "aliança"],
+      "primary_passage": {
+        "book": "Salmos",
+        "chapter": 128,
+        "start_verse": 1,
+        "end_verse": 4,
+        "theme_title": "Um Lar Abençoado pelo Senhor",
+        "context_summary": "Um dos belos Cânticos de Romagem entoados pelas famílias de Israel ao subirem para adorar em Jerusalém, celebrando a alegria, o sustento e a harmonia do lar fundamentado em Deus.",
+        "reflection": "A família é um dos presentes mais sublimes criados por Deus. Celebrar o amor, o companheirismo e a união em torno da mesa é experimentar um pedacinho do céu na terra. Quando o Senhor é o alicerce da casa, há graça para os dias comuns, cuidado mútuo e bênção contínua sobre cada geração.",
+        "guided_prayer": "Pai amoroso, muito obrigado pela minha família e pelas pessoas queridas que colocaste ao meu lado! Derrama a Tua proteção, saúde, diálogo e ternura sobre o nosso lar. Que o amor paciente e bondoso de Cristo seja sempre o elo perfeito que nos une e abençoa a nossa mesa. Em nome de Jesus, amém!",
+        "practical_step": "Dê um abraço sincero ou envie uma mensagem de gratidão hoje para quem você ama na sua família, dizendo o quanto essa pessoa é importante na sua vida."
+      },
+      "alternative_passages": [
+        {"book": "1 Coríntios", "chapter": 13, "start_verse": 4, "end_verse": 7, "note": "O amor é paciente, o amor é bondoso... tudo sofre, tudo crê, tudo espera"},
+        {"book": "Salmos", "chapter": 133, "start_verse": 1, "end_verse": 1, "note": "Como é bom e agradável quando os irmãos convivem em união!"},
+        {"book": "Josué", "chapter": 24, "start_verse": 15, "end_verse": 15, "note": "Eu e a minha família serviremos ao Senhor"},
+        {"book": "Colossenses", "chapter": 3, "start_verse": 14, "end_verse": 14, "note": "Acima de tudo, porém, revistam-se do amor, que é o elo perfeito"}
+      ]
     }
   ]
 }

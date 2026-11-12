@@ -212,6 +212,78 @@ const THEME_BOOK_MAP: Record<string, BookRecommendation[]> = {
       coverEmoji: "🔥",
     },
   ],
+  alegria_felicidade: [
+    {
+      title: "Surpreendido pela Alegria",
+      author: "C.S. Lewis",
+      description: "A clássica obra em que C.S. Lewis narra como a busca pelo verdadeiro júbilo o conduziu a Deus.",
+      category: "Alegria Cristã",
+      amazonQuery: "Surpreendido+pela+Alegria+CS+Lewis",
+      coverEmoji: "☀️",
+    },
+    {
+      title: "Desperte seu Coração com Gratidão",
+      author: "Ann Voskamp",
+      description: "Um convite poético e transformador para enxergar a graça e a beleza de Deus no cotidiano.",
+      category: "Vida Devocional",
+      amazonQuery: "Mil+Presentes+Ann+Voskamp",
+      coverEmoji: "🌻",
+    },
+  ],
+  vitoria_conquista: [
+    {
+      title: "Uma Vida com Propósitos",
+      author: "Rick Warren",
+      description: "Descubra como viver conquistas com significado eterno e alinhar seus passos ao plano de Deus.",
+      category: "Propósito Cristão",
+      amazonQuery: "Uma+Vida+com+Propositos+Rick+Warren",
+      coverEmoji: "🏆",
+    },
+    {
+      title: "O Peregrino",
+      author: "John Bunyan",
+      description: "A jornada inspiradora de perseverança e vitória pela fé rumo à Cidade Celestial.",
+      category: "Clássico da Fé",
+      amazonQuery: "O+Peregrino+John+Bunyan",
+      coverEmoji: "⚔️",
+    },
+  ],
+  paz_serenidade: [
+    {
+      title: "Tudo Vai Ficar Bem",
+      author: "Max Lucado",
+      description: "Reflexões serenas sobre descansar o coração nas promessas de paz que excedem todo entendimento.",
+      category: "Paz Interior",
+      amazonQuery: "Max+Lucado+paz",
+      coverEmoji: "🕊️",
+    },
+    {
+      title: "A Prática da Presença de Deus",
+      author: "Irmão Lourenço",
+      description: "Um tesouro espiritual sobre cultivar quietude, paz e comunhão constante com Deus no dia a dia.",
+      category: "Espiritualidade Cristã",
+      amazonQuery: "A+Pratica+da+Presenca+de+Deus+Irmao+Lourenco",
+      coverEmoji: "✨",
+    },
+  ],
+  amor_familia: [
+    {
+      title: "As Cinco Linguagens do Amor",
+      author: "Gary Chapman",
+      description: "Princípios práticos para fortalecer o amor, a escuta e a unidade no casamento e na família.",
+      category: "Família & Relacionamentos",
+      amazonQuery: "As+Cinco+Linguagens+do+Amor+Gary+Chapman",
+      coverEmoji: "🏡",
+    },
+    {
+      title: "O Amor que Não Se Acaba",
+      author: "Timothy Keller & Kathy Keller",
+      description: "Uma visão bíblica profunda sobre aliança, serviço mútuo e a beleza do lar edificado em Cristo.",
+      category: "Casamento & Lar",
+      amazonQuery: "O+Significado+do+Casamento+Timothy+Keller",
+      coverEmoji: "❤️",
+    },
+  ],
   default: [
     {
       title: "Café com Deus Pai (Devocional Diário)",

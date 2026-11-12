@@ -1087,6 +1087,61 @@ export const TOPIC_PASSAGES: Record<string, CuratedTopicPassage[]> = {
     { book: "Colossenses", chapter: 3, startVerse: 12, endVerse: 14, note: "Revesti-vos de amor, que é o vínculo da perfeição" },
     { book: "Efésios", chapter: 4, startVerse: 2, endVerse: 3, note: "Com toda humildade e mansidão, suportando-vos mutuamente em amor" },
     { book: "Provérbios", chapter: 14, startVerse: 1, endVerse: 1, note: "A mulher sábia edifica a sua casa" }
+  ],
+  gratidao_louvor: [
+    { book: "Salmos", chapter: 103, startVerse: 1, endVerse: 5, note: "Bendize, ó minha alma, ao Senhor, e não te esqueças de nenhum de seus benefícios" },
+    { book: "1 Tessalonicenses", chapter: 5, startVerse: 16, endVerse: 18, note: "Alegrem-se sempre, orem continuamente, dêem graças em todas as circunstâncias" },
+    { book: "Salmos", chapter: 100, startVerse: 1, endVerse: 5, note: "Entrem por suas portas com ações de graças e em seus átrios com louvor" },
+    { book: "Salmos", chapter: 118, startVerse: 24, endVerse: 24, note: "Este é o dia que o Senhor fez; regozijemo-nos e alegremo-nos nele" },
+    { book: "Salmos", chapter: 136, startVerse: 1, endVerse: 3, note: "Dêem graças ao Senhor porque ele é bom; o seu amor dura para sempre" },
+    { book: "Colossenses", chapter: 3, startVerse: 17, endVerse: 17, note: "Tudo o que fizerem, façam em nome do Senhor Jesus, dando por meio dele graças a Deus" },
+    { book: "Salmos", chapter: 9, startVerse: 1, endVerse: 2, note: "Eu te louvarei, Senhor, de todo o coração; contarei todas as tuas maravilhas" }
+  ],
+  alegria_felicidade: [
+    { book: "Filipenses", chapter: 4, startVerse: 4, endVerse: 5, note: "Alegrem-se sempre no Senhor. Novamente direi: Alegrem-se!" },
+    { book: "Neemias", chapter: 8, startVerse: 10, endVerse: 10, note: "Não se entristeçam, porque a alegria do Senhor os fortalecerá" },
+    { book: "Salmos", chapter: 16, startVerse: 11, endVerse: 11, note: "Na tua presença há plenitude de alegria; à tua direita, há prazer eterno" },
+    { book: "João", chapter: 15, startVerse: 11, endVerse: 11, note: "Para que a minha alegria esteja em vocês e a alegria de vocês seja completa" },
+    { book: "Salmos", chapter: 126, startVerse: 2, endVerse: 3, note: "Grandes coisas fez o Senhor por nós, por isso estamos alegres" },
+    { book: "Romanos", chapter: 15, startVerse: 13, endVerse: 13, note: "O Deus da esperança os encha de toda alegria e paz por sua confiança nele" },
+    { book: "Provérbios", chapter: 17, startVerse: 22, endVerse: 22, note: "O coração alegre é bom remédio" },
+    { book: "Salmos", chapter: 30, startVerse: 11, endVerse: 12, note: "Mudaste o meu pranto em dança; removeste o meu lamento e me cingiste de alegria" }
+  ],
+  vitoria_conquista: [
+    { book: "1 Coríntios", chapter: 15, startVerse: 57, endVerse: 58, note: "Graças a Deus, que nos dá a vitória por meio de nosso Senhor Jesus Cristo" },
+    { book: "Romanos", chapter: 8, startVerse: 37, endVerse: 37, note: "Em todas estas coisas somos mais que vencedores, por meio daquele que nos amou" },
+    { book: "Provérbios", chapter: 16, startVerse: 3, endVerse: 3, note: "Consagre ao Senhor tudo o que você faz, e os seus planos serão bem-sucedidos" },
+    { book: "Salmos", chapter: 118, startVerse: 15, endVerse: 16, note: "A mão direita do Senhor age com poder e faz proezas" },
+    { book: "Salmos", chapter: 20, startVerse: 4, endVerse: 5, note: "Conceda-te conforme o teu coração e cumpra todo o teu propósito" },
+    { book: "2 Coríntios", chapter: 2, startVerse: 14, endVerse: 14, note: "Graças a Deus, que sempre nos conduz vitoriosamente em Cristo" },
+    { book: "Deuteronômio", chapter: 28, startVerse: 6, endVerse: 6, note: "Vocês serão abençoados em tudo o que fizerem" },
+    { book: "1 João", chapter: 5, startVerse: 4, endVerse: 4, note: "Esta é a vitória que vence o mundo: a nossa fé" }
+  ],
+  paz_serenidade: [
+    { book: "João", chapter: 14, startVerse: 27, endVerse: 27, note: "Deixo a paz com vocês; a minha paz lhes dou" },
+    { book: "Isaías", chapter: 26, startVerse: 3, endVerse: 3, note: "Tu guardarás em perfeita paz aquele cujo propósito está firme, porque em ti confia" },
+    { book: "Salmos", chapter: 4, startVerse: 8, endVerse: 8, note: "Em paz me deito e logo adormeço, pois só tu, Senhor, me fazes viver em segurança" },
+    { book: "Salmos", chapter: 29, startVerse: 11, endVerse: 11, note: "O Senhor dá força ao seu povo; o Senhor dá a seu povo a bênção da paz" },
+    { book: "Colossenses", chapter: 3, startVerse: 15, endVerse: 15, note: "Que a paz de Cristo seja o juiz em seu coração" },
+    { book: "Números", chapter: 6, startVerse: 24, endVerse: 26, note: "O Senhor te abençoe e te guarde... e te dê a paz" },
+    { book: "Salmos", chapter: 85, startVerse: 8, endVerse: 8, note: "Ele promete paz ao seu povo, aos seus fiéis" }
+  ],
+  amor_familia: [
+    { book: "Salmos", chapter: 128, startVerse: 1, endVerse: 4, note: "Como é feliz quem teme ao Senhor e anda em seus caminhos! Assim será abençoada a sua casa" },
+    { book: "1 Coríntios", chapter: 13, startVerse: 4, endVerse: 7, note: "O amor é paciente, o amor é bondoso... tudo sofre, tudo crê, tudo espera" },
+    { book: "Salmos", chapter: 133, startVerse: 1, endVerse: 1, note: "Como é bom e agradável quando os irmãos convivem em união!" },
+    { book: "Josué", chapter: 24, startVerse: 15, endVerse: 15, note: "Eu e a minha família serviremos ao Senhor" },
+    { book: "Colossenses", chapter: 3, startVerse: 14, endVerse: 14, note: "Acima de tudo, porém, revistam-se do amor, que é o elo perfeito" },
+    { book: "Eclesiastes", chapter: 4, startVerse: 9, endVerse: 12, note: "Melhor é terem companhia do que estar sozinho... o cordão de três dobras não se rompe" },
+    { book: "1 João", chapter: 4, startVerse: 7, endVerse: 8, note: "Amados, amemos uns aos outros, pois o amor procede de Deus" }
+  ],
+  culpa_arrependimento: [
+    { book: "1 João", chapter: 1, startVerse: 8, endVerse: 9, note: "Se confessarmos os nossos pecados, ele é fiel e justo para nos perdoar" },
+    { book: "Romanos", chapter: 8, startVerse: 1, endVerse: 2, note: "Portanto, agora já não há condenação para os que estão em Cristo Jesus" },
+    { book: "Salmos", chapter: 103, startVerse: 11, endVerse: 13, note: "Quanto o oriente está longe do ocidente, assim ele afasta de nós as nossas transgressões" },
+    { book: "Miquéias", chapter: 7, startVerse: 18, endVerse: 19, note: "Lançará todos os nossos pecados nas profundezas do mar" },
+    { book: "Salmos", chapter: 51, startVerse: 10, endVerse: 12, note: "Cria em mim um coração puro, ó Deus, e renova dentro de mim um espírito estável" },
+    { book: "Isaías", chapter: 1, startVerse: 18, endVerse: 18, note: "Ainda que os seus pecados sejam como a escarlate, eles se tornarão brancos como a neve" }
   ]
 };
 
