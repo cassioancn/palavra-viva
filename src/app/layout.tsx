@@ -118,6 +118,13 @@ export default function RootLayout({
           />
         )}
 
+        {/* Adcash Ads */}
+        <Script
+          id="aclib"
+          src="https://acscdn.com/script/aclib.js"
+          strategy="afterInteractive"
+        />
+
         {/* Infolinks Ads */}
         <Script id="infolinks-config" strategy="lazyOnload">
           {`

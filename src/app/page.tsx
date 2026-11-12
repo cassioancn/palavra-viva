@@ -11,6 +11,7 @@ import { PixDonationModal } from "@/components/PixDonationModal";
 import { RecommendedBooks } from "@/components/RecommendedBooks";
 import { HotmartFeaturedSection } from "@/components/HotmartFeaturedSection";
 import { AdBanner } from "@/components/AdBanner";
+import { AdcashBanner } from "@/components/AdcashBanner";
 import { Footer } from "@/components/Footer";
 import { LegalModal, type LegalTab } from "@/components/LegalModal";
 import { ContactModal } from "@/components/ContactModal";
@@ -644,6 +645,11 @@ export default function HomePage() {
               <AdBanner slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_BOTTOM} />
             </div>
           )}
+        </div>
+
+        {/* Banner Display 300x250 Adcash (antes do rodapé, sem interromper a leitura) */}
+        <div className="pt-2 pb-2 flex justify-center">
+          <AdcashBanner zoneId="12437738" />
         </div>
       </main>
 
