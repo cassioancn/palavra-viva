@@ -15,6 +15,7 @@ import {
   buildFullTextSearchResponse,
   getDiverseComfortFallback,
   getMorePassagesForContext,
+  isExcludedRef,
   ResolvedBibleResponse,
 } from "@/lib/bibleSearchEngine";
 
@@ -49,36 +50,39 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const excludeRefs = body.excludeReferences || [];
-    const normExcluded = new Set(
-      excludeRefs.map((r) => stripAccents(r).replace(/\s+/g, ""))
-    );
+    const excludeRefs = Array.isArray(body.excludeReferences) ? body.excludeReferences : [];
     const isExcluded = (ref: string) => {
       if (!ref) return false;
-      const clean = stripAccents(ref).replace(/\s+/g, "");
-      return normExcluded.has(clean);
+      return isExcludedRef(ref, excludeRefs);
     };
 
     // -------------------------------------------------------------
-    // ETAPA 1: PARSER DE REFERÊNCIA DIRETA ("João 3:16", "Sl 23", "1 Co 13:4", etc.)
+    // ETAPA 1: PARSER DE REFERÊNCIA DIRETA ("João 3:16", "Sl 23", "Salmos 34:18-19", etc.)
     // -------------------------------------------------------------
     const directParsed = parsePassageReference(query, version);
-    if (directParsed && !isExcluded(directParsed.reference)) {
+    if (directParsed) {
+      // Quando o usuário especifica uma referência direta (ou clica em uma passagem alternativa),
+      // a passagem solicitada é SEMPRE entregue com prioridade máxima.
+      const activeExclude = excludeRefs.filter(
+        (r) => stripAccents(r).replace(/\s+/g, "") !== stripAccents(directParsed.reference).replace(/\s+/g, "")
+      );
       const alts = getMorePassagesForContext({
         context: directParsed.book,
-        excludeReferences: [directParsed.reference, ...excludeRefs],
+        themeId: body.themeId,
+        excludeReferences: [directParsed.reference, ...activeExclude],
         version,
         limit: 3,
       });
+
       return NextResponse.json({
         success: true,
         isAiGenerated: false,
         themeTitle: directParsed.reference,
         passage: directParsed,
         pastoralReflection: `A passagem de ${directParsed.reference} é uma das colunas preciosas das Sagradas Escrituras. Ao meditar neste texto divino, permita que a verdade de Deus ilumine sua mente, renove suas forças e guie os seus passos em retidão e paz.`,
-        historicalContext: `Texto das Sagradas Escrituras traduzido com fidelidade na versão ${version.toUpperCase()}.`,
-        guidedPrayer: `Senhor Deus, abro o meu coração para a Tua Palavra em ${directParsed.reference}. Que ela seja lâmpada para os meus pés e luz para o meu caminho. Em nome de Jesus, amém.`,
-        practicalStep: `Leia novamente este trecho com calma e guarde no coração o ensinamento principal que Deus falou com você.`,
+        historicalContext: `Texto das Sagradas Escrituras traduzido com fidelidade na versão ${version.toUpperCase()} (${directParsed.book}, capítulo ${directParsed.chapter}).`,
+        guidedPrayer: `Senhor Deus, abro o meu coração para a Tua Palavra em ${directParsed.reference}. Que ela seja lâmpada para os meus pés e luz para o meu caminho, trazendo paz e direção. Em nome de Jesus, amém.`,
+        practicalStep: `Leia novamente este trecho com calma e guarde no coração o ensinamento principal que Deus falou com você hoje.`,
         alternativePassages: alts,
       });
     }

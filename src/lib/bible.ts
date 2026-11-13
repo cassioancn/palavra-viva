@@ -329,19 +329,71 @@ export function getRandomComfortVerse(version: "nvi" | "aa" = "nvi"): PassageRes
   );
 }
 
+export interface ParsedRefSimple {
+  book: string;
+  chapter: number;
+  start: number;
+  end: number;
+}
+
+export function parseSimpleRef(ref: string): ParsedRefSimple | null {
+  if (!ref) return null;
+  const clean = ref.trim();
+  const match = clean.match(
+    /^((?:[1-3]\s+)?[a-zA-Z\u00C0-\u00FF]+(?:\s+[a-zA-Z\u00C0-\u00FF]+)?)\s+(\d+)(?:[:\s](\d+)(?:-(\d+))?)?$/
+  );
+  if (!match) return null;
+  const rawBook = stripAccents(match[1]).replace(/\s+/g, "");
+  const chapter = parseInt(match[2], 10);
+  const start = match[3] ? parseInt(match[3], 10) : 1;
+  const end = match[4] ? parseInt(match[4], 10) : (match[3] ? start : 999);
+  if (isNaN(chapter) || isNaN(start)) return null;
+  return { book: rawBook, chapter, start, end };
+}
+
+export function isRefOverlapping(refA: string, refB: string): boolean {
+  if (!refA || !refB) return false;
+  const normA = stripAccents(refA).replace(/\s+/g, "");
+  const normB = stripAccents(refB).replace(/\s+/g, "");
+  if (normA === normB) return true;
+
+  const pA = parseSimpleRef(refA);
+  const pB = parseSimpleRef(refB);
+  if (!pA || !pB) return false;
+  if (pA.book !== pB.book || pA.chapter !== pB.chapter) return false;
+  return pA.start <= pB.end && pB.start <= pA.end;
+}
+
+export function isExcludedRef(targetRef: string, excludedList: string[]): boolean {
+  if (!targetRef) return false;
+  const normTarget = stripAccents(targetRef).replace(/\s+/g, "");
+  const targetParsed = parseSimpleRef(targetRef);
+
+  for (const ex of excludedList) {
+    if (!ex) continue;
+    const normEx = stripAccents(ex).replace(/\s+/g, "");
+    if (normTarget === normEx) return true;
+    if (targetParsed) {
+      const exParsed = parseSimpleRef(ex);
+      if (exParsed && exParsed.book === targetParsed.book && exParsed.chapter === targetParsed.chapter) {
+        if (targetParsed.start <= exParsed.end && exParsed.start <= targetParsed.end) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
 export function buildThematicResponse(
   theme: ThemeItem,
   version: "nvi" | "aa" = "nvi",
   excludeReferences: string[] = []
 ) {
-  const normExcluded = new Set(
-    (excludeReferences || []).map((r) => stripAccents(r).replace(/\s+/g, ""))
-  );
-
+  const dynamicExcluded = [...excludeReferences];
   const isExcluded = (ref: string) => {
     if (!ref) return false;
-    const clean = stripAccents(ref).replace(/\s+/g, "");
-    return normExcluded.has(clean);
+    return isExcludedRef(ref, dynamicExcluded);
   };
 
   interface CandidateEntry {
@@ -409,7 +461,7 @@ export function buildThematicResponse(
   }
 
   // Registra a passagem escolhida como excluída para as alternativas secundárias
-  normExcluded.add(stripAccents(chosenPassage.reference).replace(/\s+/g, ""));
+  dynamicExcluded.push(chosenPassage.reference);
 
   // 4. Monta as alternativas (somente passagens ainda inéditas)
   const alternativePassages = [];
@@ -417,7 +469,7 @@ export function buildThematicResponse(
     if (alternativePassages.length >= 3) break;
     const p = getPassage(cand.book, cand.chapter, cand.startVerse, cand.endVerse, version);
     if (p && !isExcluded(p.reference)) {
-      normExcluded.add(stripAccents(p.reference).replace(/\s+/g, ""));
+      dynamicExcluded.push(p.reference);
       alternativePassages.push({
         reference: p.reference,
         note: cand.note || cand.themeTitle || `Palavra de consolo em ${cand.book}`,

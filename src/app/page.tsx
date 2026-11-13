@@ -154,9 +154,14 @@ export default function HomePage() {
         }),
       });
 
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Erro ao consultar as Escrituras.");
+      let data: any = null;
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        data = await res.json().catch(() => null);
+      }
+
+      if (!res.ok || !data || !data.success) {
+        throw new Error(data?.error || "Não foi possível consultar as Escrituras no momento. Tente novamente.");
       }
 
       setResult(data);
@@ -186,7 +191,8 @@ export default function HomePage() {
     const previousPassage = result?.passage;
     const previousThemeTitle = result?.themeTitle;
 
-    setSeenReferences((prev) => Array.from(new Set([...prev, alt.reference])));
+    const updatedSeen = Array.from(new Set([...seenReferences, alt.reference]));
+    setSeenReferences(updatedSeen);
     setIsLoading(true);
     setErrorMsg(null);
 
@@ -198,17 +204,23 @@ export default function HomePage() {
           feeling: alt.reference,
           version,
           mode: "search",
-          excludeReferences: seenReferences,
+          themeId: result?.themeId,
+          excludeReferences: updatedSeen.filter((r) => r !== alt.reference),
         }),
       });
 
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Erro ao carregar a passagem selecionada.");
+      let data: any = null;
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        data = await res.json().catch(() => null);
+      }
+
+      if (!res.ok || !data || !data.success) {
+        throw new Error(data?.error || "Erro ao carregar a passagem selecionada.");
       }
 
       // Faz o swap inteligente: a passagem anterior vai para a lista de alternativas
-      let newAlternatives = (result?.alternativePassages || []).filter(
+      let newAlternatives = (data.alternativePassages || []).filter(
         (a: any) => a.reference !== alt.reference
       );
 
@@ -232,13 +244,13 @@ export default function HomePage() {
 
       setResult({
         ...data,
-        themeId: result?.themeId,
+        themeId: result?.themeId || data.themeId,
         alternativePassages: newAlternatives.slice(0, 3),
       });
 
       setTimeout(() => {
         resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 100);
+      }, 50);
     } catch (err: any) {
       setErrorMsg(err.message || "Erro ao carregar versículo.");
     } finally {
@@ -272,8 +284,13 @@ export default function HomePage() {
         }),
       });
 
-      const data = await res.json();
-      if (data.success && data.passages && data.passages.length > 0) {
+      let data: any = null;
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        data = await res.json().catch(() => null);
+      }
+
+      if (data && data.success && data.passages && data.passages.length > 0) {
         setResult((prev: any) => ({
           ...prev,
           alternativePassages: data.passages,
@@ -318,9 +335,14 @@ export default function HomePage() {
         }),
       });
 
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || "Não encontramos outra passagem inédita para este contexto.");
+      let data: any = null;
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        data = await res.json().catch(() => null);
+      }
+
+      if (!res.ok || !data || !data.success) {
+        throw new Error(data?.error || "Não encontramos outra passagem inédita para este contexto.");
       }
 
       // Passagem principal anterior vai para as alternativas para preservar o histórico
@@ -587,6 +609,11 @@ export default function HomePage() {
         {/* AdSense Top Slot (se configurado) */}
         <AdBanner slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_TOP} />
 
+        {/* Banner Display 300x100 Adcash */}
+        <div className="pt-1 pb-3 flex justify-center">
+          <AdcashBanner zoneId="12441886" format="300x100" />
+        </div>
+
         {/* Result Area */}
         <div ref={resultRef}>
           {result && result.passage && (
@@ -649,7 +676,7 @@ export default function HomePage() {
 
         {/* Banner Display 300x250 Adcash (antes do rodapé, sem interromper a leitura) */}
         <div className="pt-2 pb-2 flex justify-center">
-          <AdcashBanner zoneId="12437738" />
+          <AdcashBanner zoneId="12437738" format="300x250" />
         </div>
       </main>
 

@@ -5,7 +5,14 @@ import {
   stripAccents,
   PassageResult,
   BibleBook,
+  parseSimpleRef,
+  isRefOverlapping,
+  isExcludedRef,
+  ParsedRefSimple,
 } from "./bible";
+
+export { parseSimpleRef, isRefOverlapping, isExcludedRef };
+export type { ParsedRefSimple };
 
 // -------------------------------------------------------------
 // STOPWORDS EM PORTUGUÊS (Elimina ruído gramatical e meta-buscas)
@@ -792,6 +799,42 @@ export interface ScoredVerseMatch {
   reference: string;
 }
 
+// Cache de versículos pré-normalizados em memória para buscas instantâneas (<15ms)
+interface FlatVerse {
+  book: string;
+  chapter: number;
+  verse: number;
+  text: string;
+  clean: string;
+}
+
+const flatVersesCache: Map<string, FlatVerse[]> = new Map();
+
+function getFlatVerses(version: "nvi" | "aa"): FlatVerse[] {
+  let cached = flatVersesCache.get(version);
+  if (cached) return cached;
+
+  const dataset = loadBibleData(version);
+  cached = [];
+  for (const b of dataset) {
+    for (let c = 0; c < b.chapters.length; c++) {
+      const ch = b.chapters[c];
+      for (let v = 0; v < ch.length; v++) {
+        const text = ch[v];
+        cached.push({
+          book: b.name,
+          chapter: c + 1,
+          verse: v + 1,
+          text: text.trim(),
+          clean: stripAccents(text),
+        });
+      }
+    }
+  }
+  flatVersesCache.set(version, cached);
+  return cached;
+}
+
 export function searchBibleFullText(
   rawQuery: string,
   version: "nvi" | "aa" = "nvi",
@@ -805,66 +848,58 @@ export function searchBibleFullText(
 
   const originalStems = originalTerms.map(stem);
   const expandedTerms = expandTerms(originalTerms);
-  const expandedStems = expandedTerms.map(stem);
-
-  const dataset = loadBibleData(version);
+  const flat = getFlatVerses(version);
   const scored: ScoredVerseMatch[] = [];
 
-  for (const b of dataset) {
-    for (let c = 0; c < b.chapters.length; c++) {
-      const ch = b.chapters[c];
-      for (let v = 0; v < ch.length; v++) {
-        const text = ch[v];
-        const cleanV = stripAccents(text);
-        const vWords = cleanV.split(/[^\w\s]+/).join(" ").split(/\s+/).filter((w) => w.length >= 2);
-        const vStems = vWords.map(stem);
+  for (let i = 0; i < flat.length; i++) {
+    const fv = flat[i];
+    let score = 0;
 
-        let score = 0;
+    // 1. Frase idêntica
+    if (fv.clean.includes(cleanQ)) {
+      score += 250;
+    }
 
-        // 1. Frase idêntica
-        if (cleanV.includes(cleanQ)) {
-          score += 250;
-        }
+    // 2. Acertos de termos originais (sub-string matching rápido, sem overhead de regex)
+    let origHits = 0;
+    for (let t = 0; t < originalTerms.length; t++) {
+      const term = originalTerms[t];
+      const st = originalStems[t];
+      if (fv.clean.includes(term)) {
+        origHits++;
+        score += 35;
+      } else if (st.length >= 3 && fv.clean.includes(st)) {
+        origHits++;
+        score += 25;
+      }
+    }
 
-        // 2. Acertos de termos originais (por palavra inteira ou por stem)
-        let origHits = 0;
-        for (let i = 0; i < originalTerms.length; i++) {
-          const t = originalTerms[i];
-          const st = originalStems[i];
-          if (cleanV.includes(t)) {
-            origHits++;
-            score += 35;
-          } else if (vStems.includes(st)) {
-            origHits++;
-            score += 25;
-          }
-        }
+    // Bônus se múltiplos termos originais estiverem no versículo
+    if (origHits === originalTerms.length && originalTerms.length > 1) {
+      score += 80;
+    } else if (originalTerms.length > 2 && origHits >= originalTerms.length - 1) {
+      score += 40;
+    }
 
-        // Bônus se todos ou quase todos os termos originais estiverem no versículo
-        if (origHits === originalTerms.length && originalTerms.length > 1) {
-          score += 80;
-        } else if (originalTerms.length > 2 && origHits >= originalTerms.length - 1) {
-          score += 40;
-        }
+    // 3. Casamento de sinônimos/termos expandidos
+    for (let e = 0; e < expandedTerms.length; e++) {
+      if (fv.clean.includes(expandedTerms[e])) {
+        score += 12;
+      }
+    }
 
-        // 3. Casamento de sinônimos/termos expandidos
-        for (let i = 0; i < expandedTerms.length; i++) {
-          const st = expandedStems[i];
-          if (vStems.includes(st)) {
-            score += 10;
-          }
-        }
-
-        if (score >= 35) {
-          scored.push({
-            book: b.name,
-            chapter: c + 1,
-            verse: v + 1,
-            text: text.trim(),
-            score,
-            reference: `${b.name} ${c + 1}:${v + 1}`,
-          });
-        }
+    if (score >= 35) {
+      scored.push({
+        book: fv.book,
+        chapter: fv.chapter,
+        verse: fv.verse,
+        text: fv.text,
+        score,
+        reference: `${fv.book} ${fv.chapter}:${fv.verse}`,
+      });
+      // Se encontrou versículos com alta pontuação suficiente, encerra cedo para poupar CPU
+      if (scored.length >= 40 && score >= 200) {
+        break;
       }
     }
   }
@@ -930,7 +965,7 @@ export function buildFullTextSearchResponse(
   };
 }
 
-// Lista diversificada de consolo com 15 versículos distintos (EVITA LOOP EM SALMO 23)
+// Lista diversificada de consolo com 25 versículos distintos (Garante rotação contínua e sem repetição)
 export const DIVERSE_COMFORT_VERSES = [
   { book: "Isaías", chapter: 41, start: 10, end: 10, title: "Não Temas, Eu Sou Contigo" },
   { book: "Filipenses", chapter: 4, start: 6, end: 7, title: "A Paz que Excede Todo Entendimento" },
@@ -941,31 +976,41 @@ export const DIVERSE_COMFORT_VERSES = [
   { book: "Salmos", chapter: 121, start: 1, end: 2, title: "O Meu Socorro Vem do Senhor" },
   { book: "Josué", chapter: 1, start: 9, end: 9, title: "Sê Forte e Corajoso" },
   { book: "João", chapter: 14, start: 27, end: 27, title: "A Minha Paz vos Dou" },
-  { book: "Salmos", chapter: 34, start: 18, end: 18, title: "Perto Está o Senhor dos Que Têm o Coração Quebrantado" },
+  { book: "Salmos", chapter: 34, start: 18, end: 19, title: "Perto Está o Senhor dos Que Têm o Coração Quebrantado" },
   { book: "Provérbios", chapter: 3, start: 5, end: 6, title: "Confia no Senhor de Todo o Teu Coração" },
   { book: "1 Pedro", chapter: 5, start: 7, end: 7, title: "Lançando Sobre Ele Toda a Vossa Ansiedade" },
   { book: "Salmos", chapter: 23, start: 1, end: 6, title: "O Senhor é o Meu Pastor" },
+  { book: "Salmos", chapter: 27, start: 1, end: 1, title: "O Senhor é a Minha Luz e Salvação" },
+  { book: "Isaías", chapter: 40, start: 29, end: 31, title: "Renovação de Forças Como a Águia" },
+  { book: "Salmos", chapter: 91, start: 1, end: 2, title: "O Abrigo do Altíssimo" },
+  { book: "Lamentações", chapter: 3, start: 22, end: 24, title: "As Misericórdias do Senhor São a Causa de Não Sermos Consumidos" },
+  { book: "Salmos", chapter: 30, start: 5, end: 5, title: "A Alegria Vem Pela Manhã" },
+  { book: "2 Coríntios", chapter: 1, start: 3, end: 4, title: "O Deus de Toda Consolação" },
+  { book: "Salmos", chapter: 147, start: 3, end: 3, title: "Ele Sara os Quebrantados de Coração" },
+  { book: "João", chapter: 16, start: 33, end: 33, title: "Tende Bom Ânimo, Eu Venci o Mundo" },
+  { book: "Salmos", chapter: 62, start: 1, end: 2, title: "Minha Alma Descansa Somente em Deus" },
+  { book: "Apocalipse", chapter: 21, start: 4, end: 4, title: "Ele Enxugará Toda Lágrima" },
+  { book: "Romanos", chapter: 8, start: 38, end: 39, title: "Nada Pode Nos Separar do Amor de Deus" },
+  { book: "Habacuque", chapter: 3, start: 17, end: 19, title: "Ainda que a Figueira Não Floresça, Eu me Alegrarei no Senhor" }
 ];
 
 export function getDiverseComfortFallback(
   version: "nvi" | "aa" = "nvi",
   excludeReferences: string[] = []
 ): ResolvedBibleResponse {
-  const normExcluded = new Set(
-    (excludeReferences || []).map((r) => stripAccents(r).replace(/\s+/g, ""))
-  );
-
   const available = DIVERSE_COMFORT_VERSES.filter((c) => {
     const ref =
       c.start === c.end
         ? `${c.book} ${c.chapter}:${c.start}`
         : `${c.book} ${c.chapter}:${c.start}-${c.end}`;
-    return !normExcluded.has(stripAccents(ref).replace(/\s+/g, ""));
+    return !isExcludedRef(ref, excludeReferences);
   });
 
   const pool = available.length > 0 ? available : DIVERSE_COMFORT_VERSES;
   const pick = pool[Math.floor(Math.random() * pool.length)];
-  const p = getPassage(pick.book, pick.chapter, pick.start, pick.end, version)!;
+  const p =
+    getPassage(pick.book, pick.chapter, pick.start, pick.end, version) ||
+    getPassage("Salmos", 23, 1, 6, version)!;
 
   return {
     success: true,
@@ -985,7 +1030,7 @@ export function getDiverseComfortFallback(
 }
 
 // -------------------------------------------------------------
-// CATÁLOGO EXPANDIDO DE PASSAGENS POR TEMA (Para busca sem repetições e sem loop)
+// CATÁLOGO EXPANDIDO DE PASSAGENS POR TEMA (Amplo acervo para rotação contínua sem repetições)
 // -------------------------------------------------------------
 export interface CuratedTopicPassage {
   book: string;
@@ -1008,7 +1053,11 @@ export const TOPIC_PASSAGES: Record<string, CuratedTopicPassage[]> = {
     { book: "Provérbios", chapter: 3, startVerse: 9, endVerse: 10, note: "Honra ao Senhor com os teus bens e com as primícias" },
     { book: "1 Timóteo", chapter: 6, startVerse: 6, endVerse: 8, note: "A piedade com contentamento é grande fonte de lucro" },
     { book: "Deuteronômio", chapter: 8, startVerse: 18, endVerse: 18, note: "Ele é o que te dá força para adquirires riquezas" },
-    { book: "Salmos", chapter: 23, startVerse: 1, endVerse: 1, note: "O Senhor é o meu pastor; nada me faltará" }
+    { book: "Salmos", chapter: 23, startVerse: 1, endVerse: 1, note: "O Senhor é o meu pastor; nada me faltará" },
+    { book: "Salmos", chapter: 112, startVerse: 1, endVerse: 3, note: "Prosperidade e riquezas haverá na sua casa" },
+    { book: "Provérbios", chapter: 10, startVerse: 22, endVerse: 22, note: "A bênção do Senhor enriquece e não traz dores" },
+    { book: "Eclesiastes", chapter: 5, startVerse: 19, endVerse: 19, note: "A todo homem a quem Deus deu riquezas e poder para desfrutá-las" },
+    { book: "Salmos", chapter: 128, startVerse: 1, endVerse: 2, note: "Do trabalho de tuas mãos comerás, feliz serás e tudo te irá bem" }
   ],
   ansiedade_futuro: [
     { book: "Filipenses", chapter: 4, startVerse: 6, endVerse: 7, note: "Não andeis ansiosos por coisa alguma; antes, orai" },
@@ -1020,18 +1069,37 @@ export const TOPIC_PASSAGES: Record<string, CuratedTopicPassage[]> = {
     { book: "Salmos", chapter: 56, startVerse: 3, endVerse: 3, note: "Em me vindo o temor, hei de confiar em ti" },
     { book: "2 Timóteo", chapter: 1, startVerse: 7, endVerse: 7, note: "Deus não nos deu espírito de covardia, mas de poder e amor" },
     { book: "João", chapter: 14, startVerse: 27, endVerse: 27, note: "Deixo-vos a paz, a minha paz vos dou; não se turbe o vosso coração" },
-    { book: "Salmos", chapter: 46, startVerse: 1, endVerse: 2, note: "Deus é o nosso refúgio e fortaleza, socorro bem presente" }
+    { book: "Salmos", chapter: 46, startVerse: 1, endVerse: 2, note: "Deus é o nosso refúgio e fortaleza, socorro bem presente" },
+    { book: "Salmos", chapter: 37, startVerse: 5, endVerse: 5, note: "Entrega o teu caminho ao Senhor; confia nele, e o mais ele fará" },
+    { book: "Provérbios", chapter: 12, startVerse: 25, endVerse: 25, note: "O coração ansioso deprime o homem, mas uma palavra bondosa o alegra" },
+    { book: "Isaías", chapter: 26, startVerse: 3, endVerse: 3, note: "Tu guardarás em perfeita paz aquele cujo propósito está firme" },
+    { book: "Salmos", chapter: 118, startVerse: 6, endVerse: 6, note: "O Senhor está comigo, nada temerei; que me poderá fazer o homem?" },
+    { book: "Jeremias", chapter: 17, startVerse: 7, endVerse: 8, note: "Bendito o homem que confia no Senhor, cuja esperança é o Senhor" },
+    { book: "Salmos", chapter: 91, startVerse: 1, endVerse: 2, note: "Aquele que habita no esconderijo do Altíssimo descansará" },
+    { book: "Lucas", chapter: 12, startVerse: 25, endVerse: 26, note: "Quem de vocês, por mais que se preocupe, pode acrescentar uma hora à sua vida?" },
+    { book: "Salmos", chapter: 62, startVerse: 5, endVerse: 6, note: "Descansa, ó minha alma, somente em Deus, pois dele vem minha esperança" }
   ],
   luto_tristeza_perda: [
-    { book: "Salmos", chapter: 34, startVerse: 18, endVerse: 18, note: "Perto está o Senhor dos que têm o coração quebrantado" },
-    { book: "João", chapter: 11, startVerse: 25, endVerse: 26, note: "Eu sou a ressurreição e a vida; quem crê em mim viverá" },
-    { book: "Apocalipse", chapter: 21, startVerse: 4, endVerse: 4, note: "Ele enxugará dos seus olhos toda lágrima e não haverá mais morte" },
+    { book: "Salmos", chapter: 34, startVerse: 18, endVerse: 19, note: "Perto está o Senhor dos que têm o coração quebrantado e salva os abatidos" },
     { book: "Mateus", chapter: 5, startVerse: 4, endVerse: 4, note: "Bem-aventurados os que choram, porque eles serão consolados" },
+    { book: "Apocalipse", chapter: 21, startVerse: 4, endVerse: 4, note: "Ele enxugará dos seus olhos toda lágrima e não haverá mais morte nem pranto" },
     { book: "Salmos", chapter: 23, startVerse: 4, endVerse: 4, note: "Ainda que eu ande pelo vale da sombra da morte, não temerei mal algum" },
+    { book: "João", chapter: 11, startVerse: 25, endVerse: 26, note: "Eu sou a ressurreição e a vida; quem crê em mim viverá, ainda que morra" },
     { book: "2 Coríntios", chapter: 1, startVerse: 3, endVerse: 4, note: "O Pai das misericórdias e Deus de toda consolação nos conforta" },
     { book: "1 Tessalonicenses", chapter: 4, startVerse: 13, endVerse: 14, note: "Para que não vos entristeçais como os que não têm esperança" },
     { book: "Salmos", chapter: 147, startVerse: 3, endVerse: 3, note: "Ele sara os quebrantados de coração e cura-lhes as feridas" },
-    { book: "Romanos", chapter: 8, startVerse: 38, endVerse: 39, note: "Nem a morte nem a vida poderá nos separar do amor de Deus" }
+    { book: "Romanos", chapter: 8, startVerse: 38, endVerse: 39, note: "Nem a morte nem a vida poderá nos separar do amor de Deus" },
+    { book: "Salmos", chapter: 30, startVerse: 5, endVerse: 5, note: "O choro pode durar uma noite, mas a alegria vem pela manhã" },
+    { book: "Salmos", chapter: 73, startVerse: 26, endVerse: 26, note: "O meu corpo poderá fraquejar, mas Deus é a força do meu coração para sempre" },
+    { book: "Isaías", chapter: 40, startVerse: 1, endVerse: 2, note: "Consolem, consolem o meu povo, diz o vosso Deus" },
+    { book: "Salmos", chapter: 116, startVerse: 15, endVerse: 15, note: "Preciosa é aos olhos do Senhor a morte dos seus santos" },
+    { book: "Lamentações", chapter: 3, startVerse: 21, endVerse: 24, note: "Quero trazer à memória o que me dá esperança: As misericórdias do Senhor não têm fim" },
+    { book: "João", chapter: 14, startVerse: 1, endVerse: 3, note: "Não se turbe o vosso coração; credes em Deus, crede também em mim" },
+    { book: "Isaías", chapter: 61, startVerse: 1, endVerse: 3, note: "Para consolar os que choram e dar-lhes uma coroa de beleza em vez de cinzas" },
+    { book: "Salmos", chapter: 119, startVerse: 50, endVerse: 50, note: "Este é o meu consolo no meu sofrimento: A tua promessa renova a minha vida" },
+    { book: "Salmos", chapter: 42, startVerse: 11, endVerse: 11, note: "Por que estás abatida, ó minha alma? Espera em Deus, pois ainda o louvarei" },
+    { book: "Filipenses", chapter: 1, startVerse: 21, endVerse: 21, note: "Porque para mim, o viver é Cristo e o morrer é lucro" },
+    { book: "Isaías", chapter: 43, startVerse: 2, endVerse: 2, note: "Quando passares pelas águas estarei contigo; os rios não te submergirão" }
   ],
   cansaco_esgotamento: [
     { book: "Mateus", chapter: 11, startVerse: 28, endVerse: 30, note: "Venham a mim todos os cansados e sobrecarregados, e eu vos aliviarei" },
@@ -1040,7 +1108,12 @@ export const TOPIC_PASSAGES: Record<string, CuratedTopicPassage[]> = {
     { book: "Salmos", chapter: 127, startVerse: 2, endVerse: 2, note: "Aos seus amados Deus dá o sono reparador" },
     { book: "Salmos", chapter: 62, startVerse: 1, endVerse: 2, note: "A minha alma descansa somente em Deus; dele vem minha salvação" },
     { book: "Gálatas", chapter: 6, startVerse: 9, endVerse: 9, note: "Não nos cansemos de fazer o bem, pois a seu tempo ceifaremos" },
-    { book: "Salmos", chapter: 23, startVerse: 2, endVerse: 3, note: "Guia-me mansamente a águas mansas. Refrigera a minha alma" }
+    { book: "Salmos", chapter: 23, startVerse: 2, endVerse: 3, note: "Guia-me mansamente a águas mansas. Refrigera a minha alma" },
+    { book: "1 Reis", chapter: 19, startVerse: 5, endVerse: 8, note: "Levanta-te e come, porque a viagem é longa demais para ti" },
+    { book: "Jeremias", chapter: 31, startVerse: 25, endVerse: 25, note: "Pois satisfarei a alma cansada e saciarei toda alma desfalecida" },
+    { book: "Salmos", chapter: 3, startVerse: 5, endVerse: 5, note: "Eu me deitei e dormi; acordei, porque o Senhor me sustentou" },
+    { book: "Salmos", chapter: 4, startVerse: 8, endVerse: 8, note: "Em paz me deito e logo adormeço, pois só tu, Senhor, me fazes viver em segurança" },
+    { book: "Hebreus", chapter: 4, startVerse: 9, endVerse: 11, note: "Resta um descanso para o povo de Deus" }
   ],
   solidao_abandono: [
     { book: "Isaías", chapter: 49, startVerse: 15, endVerse: 16, note: "Acaso pode uma mãe esquecer-se de seu filho? Eu não me esquecerei de ti" },
@@ -1048,7 +1121,13 @@ export const TOPIC_PASSAGES: Record<string, CuratedTopicPassage[]> = {
     { book: "Mateus", chapter: 28, startVerse: 20, endVerse: 20, note: "Eis que estou convosco todos os dias, até o fim dos tempos" },
     { book: "Josué", chapter: 1, startVerse: 5, endVerse: 5, note: "Como fui com Moisés, assim serei contigo; não te deixarei" },
     { book: "Salmos", chapter: 68, startVerse: 5, endVerse: 6, note: "Pai dos órfãos e juiz das viúvas é Deus em sua santa morada" },
-    { book: "Salmos", chapter: 139, startVerse: 7, endVerse: 10, note: "Para onde me ausentarei do teu Espírito? Tua mão me susterá" }
+    { book: "Salmos", chapter: 139, startVerse: 7, endVerse: 10, note: "Para onde me ausentarei do teu Espírito? Tua mão me susterá" },
+    { book: "Deuteronômio", chapter: 31, startVerse: 6, endVerse: 6, note: "Sejam fortes e corajosos... o Senhor jamais vos deixará" },
+    { book: "João", chapter: 14, startVerse: 18, endVerse: 18, note: "Não vos deixarei órfãos; voltarei para vós" },
+    { book: "Salmos", chapter: 25, startVerse: 16, endVerse: 17, note: "Olha para mim e tem piedade de mim, pois estou só e aflito" },
+    { book: "Hebreus", chapter: 13, startVerse: 5, endVerse: 5, note: "De maneira alguma te deixarei, nunca, jamais te abandonarei" },
+    { book: "Salmos", chapter: 142, startVerse: 4, endVerse: 5, note: "Olho à minha direita e vejo: Tu és o meu refúgio e minha porção" },
+    { book: "Isaías", chapter: 41, startVerse: 17, endVerse: 17, note: "Os necessitados buscam água e não há; Eu, o Senhor, os ouvirei" }
   ],
   enfermidade_cura: [
     { book: "Jeremias", chapter: 17, startVerse: 14, endVerse: 14, note: "Cura-me, Senhor, e serei curado; salva-me, e serei salvo" },
@@ -1056,7 +1135,13 @@ export const TOPIC_PASSAGES: Record<string, CuratedTopicPassage[]> = {
     { book: "Salmos", chapter: 103, startVerse: 2, endVerse: 3, note: "Bendize ao Senhor, que sara todas as tuas enfermidades" },
     { book: "Isaías", chapter: 53, startVerse: 4, endVerse: 5, note: "Pelas suas pisaduras fomos sarados" },
     { book: "Êxodo", chapter: 15, startVerse: 26, endVerse: 26, note: "Eu sou o Senhor que te sara" },
-    { book: "Salmos", chapter: 30, startVerse: 2, endVerse: 2, note: "Senhor meu Deus, clamei por socorro e tu me saraste" }
+    { book: "Salmos", chapter: 30, startVerse: 2, endVerse: 2, note: "Senhor meu Deus, clamei por socorro e tu me saraste" },
+    { book: "Mateus", chapter: 8, startVerse: 16, endVerse: 17, note: "Ele mesmo tomou as nossas enfermidades e carregou as nossas doenças" },
+    { book: "Salmos", chapter: 41, startVerse: 3, endVerse: 3, note: "O Senhor o sustentará no leito da enfermidade" },
+    { book: "Jeremias", chapter: 30, startVerse: 17, endVerse: 17, note: "Pois te restaurarei a saúde e curarei as tuas chagas, diz o Senhor" },
+    { book: "3 João", chapter: 1, startVerse: 2, endVerse: 2, note: "Desejo que te vá bem em todas as coisas e que tenhas saúde" },
+    { book: "Lucas", chapter: 8, startVerse: 48, endVerse: 48, note: "Filha, a tua fé te salvou; vai-te em paz" },
+    { book: "Salmos", chapter: 107, startVerse: 20, endVerse: 20, note: "Enviou a sua palavra e os sarou, e os livrou da destruição" }
   ],
   perdao_magoa: [
     { book: "Efésios", chapter: 4, startVerse: 31, endVerse: 32, note: "Antes, sede benignos, perdoando-vos mutuamente como Deus vos perdoou" },
@@ -1064,7 +1149,13 @@ export const TOPIC_PASSAGES: Record<string, CuratedTopicPassage[]> = {
     { book: "Mateus", chapter: 6, startVerse: 14, endVerse: 15, note: "Se perdoardes aos homens as suas ofensas, vosso Pai vos perdoará" },
     { book: "Mateus", chapter: 18, startVerse: 21, endVerse: 22, note: "Não até sete vezes, mas até setenta vezes sete" },
     { book: "Provérbios", chapter: 19, startVerse: 11, endVerse: 11, note: "A discrição do homem o torna paciente e sua glória é esquecer as ofensas" },
-    { book: "Romanos", chapter: 12, startVerse: 19, endVerse: 21, note: "Não te deixes vencer do mal, mas vence o mal com o bem" }
+    { book: "Romanos", chapter: 12, startVerse: 19, endVerse: 21, note: "Não te deixes vencer do mal, mas vence o mal com o bem" },
+    { book: "Lucas", chapter: 6, startVerse: 37, endVerse: 37, note: "Não julgueis e não sereis julgados; perdoai e sereis perdoados" },
+    { book: "Marcos", chapter: 11, startVerse: 25, endVerse: 25, note: "Quando estiverdes orando, perdoai se tendes algo contra alguém" },
+    { book: "1 Pedro", chapter: 4, startVerse: 8, endVerse: 8, note: "O amor cobre uma multidão de pecados" },
+    { book: "Provérbios", chapter: 17, startVerse: 9, endVerse: 9, note: "Aquele que encobre a transgressão busca o amor" },
+    { book: "Mateus", chapter: 5, startVerse: 23, endVerse: 24, note: "Vai primeiro reconciliar-te com teu irmão" },
+    { book: "Salmos", chapter: 86, startVerse: 5, endVerse: 5, note: "Pois tu, Senhor, és bom, e pronto a perdoar" }
   ],
   fe_esperanca_desanimo: [
     { book: "Isaías", chapter: 40, startVerse: 28, endVerse: 31, note: "Os que esperam no Senhor renovam as suas forças como águias" },
@@ -1072,21 +1163,41 @@ export const TOPIC_PASSAGES: Record<string, CuratedTopicPassage[]> = {
     { book: "Marcos", chapter: 9, startVerse: 24, endVerse: 24, note: "Eu creio! Ajuda-me na minha falta de fé!" },
     { book: "Romanos", chapter: 8, startVerse: 28, endVerse: 28, note: "Todas as coisas cooperam para o bem daqueles que amam a Deus" },
     { book: "Jeremias", chapter: 29, startVerse: 11, endVerse: 11, note: "Planos de paz e não de mal, para vos dar um futuro e uma esperança" },
-    { book: "Salmos", chapter: 42, startVerse: 11, endVerse: 11, note: "Por que estás abatida, ó minha alma? Espera em Deus, pois ainda o louvarei" }
+    { book: "Salmos", chapter: 42, startVerse: 11, endVerse: 11, note: "Por que estás abatida, ó minha alma? Espera em Deus, pois ainda o louvarei" },
+    { book: "2 Coríntios", chapter: 4, startVerse: 16, endVerse: 18, note: "Por isso não desanimamos; o nosso homem interior se renova dia a dia" },
+    { book: "Hebreus", chapter: 10, startVerse: 35, endVerse: 36, note: "Não lanceis fora a vossa confiança, que tem grande recompensa" },
+    { book: "Salmos", chapter: 27, startVerse: 13, endVerse: 14, note: "Espera no Senhor, anima-te, e ele fortalecerá o teu coração" },
+    { book: "Provérbios", chapter: 24, startVerse: 16, endVerse: 16, note: "Porque sete vezes cai o justo e se levanta" },
+    { book: "Romanos", chapter: 15, startVerse: 13, endVerse: 13, note: "O Deus de esperança vos encha de toda a alegria e paz por sua fé" },
+    { book: "Habacuque", chapter: 3, startVerse: 17, endVerse: 19, note: "Ainda que a figueira não floresça, todavia eu me alegrarei no Senhor" }
   ],
   sabedoria_direcao: [
     { book: "Provérbios", chapter: 3, startVerse: 5, endVerse: 6, note: "Confia no Senhor de todo o teu coração e Ele endireitará tuas veredas" },
     { book: "Salmos", chapter: 119, startVerse: 105, endVerse: 105, note: "Lâmpada para os meus pés é a tua palavra e luz para o meu caminho" },
     { book: "Tiago", chapter: 1, startVerse: 5, endVerse: 5, note: "Se alguém tem falta de sabedoria, peça-a a Deus, que a todos dá com generosidade" },
     { book: "Salmos", chapter: 32, startVerse: 8, endVerse: 8, note: "Instruir-te-ei e ensinar-te-ei o caminho que deves seguir" },
-    { book: "Jeremias", chapter: 33, startVerse: 3, endVerse: 3, note: "Clama a mim e responder-te-ei, e anunciar-te-ei coisas grandes" }
+    { book: "Jeremias", chapter: 33, startVerse: 3, endVerse: 3, note: "Clama a mim e responder-te-ei, e anunciar-te-ei coisas grandes" },
+    { book: "Provérbios", chapter: 16, startVerse: 9, endVerse: 9, note: "O coração do homem planeja o seu caminho, mas o Senhor lhe dirige os passos" },
+    { book: "Isaías", chapter: 30, startVerse: 21, endVerse: 21, note: "Os teus ouvidos ouvirão uma palavra atrás de ti: Este é o caminho, andai nele" },
+    { book: "Salmos", chapter: 25, startVerse: 4, endVerse: 5, note: "Faze-me saber os teus caminhos, Senhor; ensina-me as tuas veredas" },
+    { book: "Provérbios", chapter: 4, startVerse: 7, endVerse: 7, note: "A sabedoria é a coisa principal; adquire pois a sabedoria" },
+    { book: "Provérbios", chapter: 2, startVerse: 6, endVerse: 6, note: "Porque o Senhor dá a sabedoria, e da sua boca vem o conhecimento" },
+    { book: "Salmos", chapter: 73, startVerse: 24, endVerse: 24, note: "Tu me guias com o teu conselho e depois me recebes na glória" },
+    { book: "Colossenses", chapter: 1, startVerse: 9, endVerse: 9, note: "Cheios do pleno conhecimento da sua vontade, em toda a sabedoria espiritual" }
   ],
   casamento_familia: [
     { book: "1 Coríntios", chapter: 13, startVerse: 4, endVerse: 7, note: "O amor é paciente, é benigno; não arde em ciúmes... tudo sofre, tudo crê" },
     { book: "Eclesiastes", chapter: 4, startVerse: 9, endVerse: 12, note: "Melhor é serem dois do que um... o cordão de três dobras não se rompe fácil" },
     { book: "Colossenses", chapter: 3, startVerse: 12, endVerse: 14, note: "Revesti-vos de amor, que é o vínculo da perfeição" },
     { book: "Efésios", chapter: 4, startVerse: 2, endVerse: 3, note: "Com toda humildade e mansidão, suportando-vos mutuamente em amor" },
-    { book: "Provérbios", chapter: 14, startVerse: 1, endVerse: 1, note: "A mulher sábia edifica a sua casa" }
+    { book: "Provérbios", chapter: 14, startVerse: 1, endVerse: 1, note: "A mulher sábia edifica a sua casa" },
+    { book: "Josué", chapter: 24, startVerse: 15, endVerse: 15, note: "Eu e a minha família serviremos ao Senhor" },
+    { book: "Salmos", chapter: 128, startVerse: 1, endVerse: 4, note: "Como é feliz quem teme ao Senhor! Tua casa será ricamente abençoada" },
+    { book: "Salmos", chapter: 127, startVerse: 3, endVerse: 5, note: "Os filhos são herança do Senhor, uma grande recompensa" },
+    { book: "1 João", chapter: 4, startVerse: 7, endVerse: 8, note: "Amados, amemo-nos uns aos outros, porque o amor procede de Deus" },
+    { book: "1 Pedro", chapter: 4, startVerse: 8, endVerse: 8, note: "Sobretudo, tende ardente amor uns para com os outros" },
+    { book: "Provérbios", chapter: 17, startVerse: 17, endVerse: 17, note: "O amigo ama em todo o tempo, e no dia da angústia nasce o irmão" },
+    { book: "Efésios", chapter: 5, startVerse: 25, endVerse: 25, note: "Maridos, amai as vossas mulheres, como também Cristo amou a igreja" }
   ],
   gratidao_louvor: [
     { book: "Salmos", chapter: 103, startVerse: 1, endVerse: 5, note: "Bendize, ó minha alma, ao Senhor, e não te esqueças de nenhum de seus benefícios" },
@@ -1094,8 +1205,13 @@ export const TOPIC_PASSAGES: Record<string, CuratedTopicPassage[]> = {
     { book: "Salmos", chapter: 100, startVerse: 1, endVerse: 5, note: "Entrem por suas portas com ações de graças e em seus átrios com louvor" },
     { book: "Salmos", chapter: 118, startVerse: 24, endVerse: 24, note: "Este é o dia que o Senhor fez; regozijemo-nos e alegremo-nos nele" },
     { book: "Salmos", chapter: 136, startVerse: 1, endVerse: 3, note: "Dêem graças ao Senhor porque ele é bom; o seu amor dura para sempre" },
-    { book: "Colossenses", chapter: 3, startVerse: 17, endVerse: 17, note: "Tudo o que fizerem, façam em nome do Senhor Jesus, dando por meio dele graças a Deus" },
-    { book: "Salmos", chapter: 9, startVerse: 1, endVerse: 2, note: "Eu te louvarei, Senhor, de todo o coração; contarei todas as tuas maravilhas" }
+    { book: "Colossenses", chapter: 3, startVerse: 17, endVerse: 17, note: "Tudo o que fizerem, façam em nome do Senhor Jesus, dando graças a Deus" },
+    { book: "Salmos", chapter: 9, startVerse: 1, endVerse: 2, note: "Eu te louvarei, Senhor, de todo o coração; contarei todas as tuas maravilhas" },
+    { book: "Salmos", chapter: 145, startVerse: 1, endVerse: 3, note: "Exaltar-te-ei, ó Deus meu e Rei, e bendirei o teu nome para todo o sempre" },
+    { book: "Salmos", chapter: 150, startVerse: 1, endVerse: 6, note: "Tudo o que tem fôlego louve ao Senhor. Louvai ao Senhor!" },
+    { book: "Filipenses", chapter: 4, startVerse: 4, endVerse: 4, note: "Alegrai-vos sempre no Senhor; outra vez digo: alegrai-vos!" },
+    { book: "Salmos", chapter: 34, startVerse: 1, endVerse: 3, note: "Bendirei o Senhor em todo o tempo, o seu louvor estará sempre nos meus lábios" },
+    { book: "Habacuque", chapter: 3, startVerse: 18, endVerse: 19, note: "Todavia eu me alegrarei no Senhor, exultarei no Deus da minha salvação" }
   ],
   alegria_felicidade: [
     { book: "Filipenses", chapter: 4, startVerse: 4, endVerse: 5, note: "Alegrem-se sempre no Senhor. Novamente direi: Alegrem-se!" },
@@ -1105,7 +1221,11 @@ export const TOPIC_PASSAGES: Record<string, CuratedTopicPassage[]> = {
     { book: "Salmos", chapter: 126, startVerse: 2, endVerse: 3, note: "Grandes coisas fez o Senhor por nós, por isso estamos alegres" },
     { book: "Romanos", chapter: 15, startVerse: 13, endVerse: 13, note: "O Deus da esperança os encha de toda alegria e paz por sua confiança nele" },
     { book: "Provérbios", chapter: 17, startVerse: 22, endVerse: 22, note: "O coração alegre é bom remédio" },
-    { book: "Salmos", chapter: 30, startVerse: 11, endVerse: 12, note: "Mudaste o meu pranto em dança; removeste o meu lamento e me cingiste de alegria" }
+    { book: "Salmos", chapter: 30, startVerse: 11, endVerse: 12, note: "Mudaste o meu pranto em dança; removeste o meu lamento e me cingiste de alegria" },
+    { book: "Isaías", chapter: 12, startVerse: 2, endVerse: 3, note: "Eis que Deus é a minha salvação; tirareis águas com alegria das fontes da salvação" },
+    { book: "Salmos", chapter: 97, startVerse: 11, endVerse: 12, note: "A luz resplandece sobre o justo e a alegria sobre os retos de coração" },
+    { book: "Lucas", chapter: 1, startVerse: 46, endVerse: 47, note: "A minha alma engrandece ao Senhor, e o meu espírito se alegra em Deus" },
+    { book: "1 Pedro", chapter: 1, startVerse: 8, endVerse: 9, note: "Exultais com alegria indizível e cheia de glória" }
   ],
   vitoria_conquista: [
     { book: "1 Coríntios", chapter: 15, startVerse: 57, endVerse: 58, note: "Graças a Deus, que nos dá a vitória por meio de nosso Senhor Jesus Cristo" },
@@ -1115,7 +1235,11 @@ export const TOPIC_PASSAGES: Record<string, CuratedTopicPassage[]> = {
     { book: "Salmos", chapter: 20, startVerse: 4, endVerse: 5, note: "Conceda-te conforme o teu coração e cumpra todo o teu propósito" },
     { book: "2 Coríntios", chapter: 2, startVerse: 14, endVerse: 14, note: "Graças a Deus, que sempre nos conduz vitoriosamente em Cristo" },
     { book: "Deuteronômio", chapter: 28, startVerse: 6, endVerse: 6, note: "Vocês serão abençoados em tudo o que fizerem" },
-    { book: "1 João", chapter: 5, startVerse: 4, endVerse: 4, note: "Esta é a vitória que vence o mundo: a nossa fé" }
+    { book: "1 João", chapter: 5, startVerse: 4, endVerse: 4, note: "Esta é a vitória que vence o mundo: a nossa fé" },
+    { book: "Filipenses", chapter: 4, startVerse: 13, endVerse: 13, note: "Tudo posso naquele que me fortalece" },
+    { book: "Salmos", chapter: 60, startVerse: 12, endVerse: 12, note: "Com Deus faremos proezas, e ele pisará os nossos adversários" },
+    { book: "2 Timóteo", chapter: 4, startVerse: 7, endVerse: 8, note: "Combati o bom combate, completei a carreira, guardei a fé" },
+    { book: "Isaías", chapter: 54, startVerse: 17, endVerse: 17, note: "Toda arma forjada contra ti não prosperará" }
   ],
   paz_serenidade: [
     { book: "João", chapter: 14, startVerse: 27, endVerse: 27, note: "Deixo a paz com vocês; a minha paz lhes dou" },
@@ -1124,7 +1248,12 @@ export const TOPIC_PASSAGES: Record<string, CuratedTopicPassage[]> = {
     { book: "Salmos", chapter: 29, startVerse: 11, endVerse: 11, note: "O Senhor dá força ao seu povo; o Senhor dá a seu povo a bênção da paz" },
     { book: "Colossenses", chapter: 3, startVerse: 15, endVerse: 15, note: "Que a paz de Cristo seja o juiz em seu coração" },
     { book: "Números", chapter: 6, startVerse: 24, endVerse: 26, note: "O Senhor te abençoe e te guarde... e te dê a paz" },
-    { book: "Salmos", chapter: 85, startVerse: 8, endVerse: 8, note: "Ele promete paz ao seu povo, aos seus fiéis" }
+    { book: "Salmos", chapter: 85, startVerse: 8, endVerse: 8, note: "Ele promete paz ao seu povo, aos seus fiéis" },
+    { book: "2 Tessalonicenses", chapter: 3, startVerse: 16, endVerse: 16, note: "Ora, o próprio Senhor da paz vos dê sempre paz de todas as maneiras" },
+    { book: "Salmos", chapter: 119, startVerse: 165, endVerse: 165, note: "Grande paz têm os que amam a tua lei, e para eles não há tropeço" },
+    { book: "Romanos", chapter: 5, startVerse: 1, endVerse: 1, note: "Justificados pela fé, temos paz com Deus por meio de Jesus Cristo" },
+    { book: "Filipenses", chapter: 4, startVerse: 7, endVerse: 7, note: "E a paz de Deus, que excede todo o entendimento, guardará os vossos corações" },
+    { book: "Salmos", chapter: 125, startVerse: 1, endVerse: 2, note: "Os que confiam no Senhor são como o monte Sião, que não se abala" }
   ],
   amor_familia: [
     { book: "Salmos", chapter: 128, startVerse: 1, endVerse: 4, note: "Como é feliz quem teme ao Senhor e anda em seus caminhos! Assim será abençoada a sua casa" },
@@ -1133,15 +1262,24 @@ export const TOPIC_PASSAGES: Record<string, CuratedTopicPassage[]> = {
     { book: "Josué", chapter: 24, startVerse: 15, endVerse: 15, note: "Eu e a minha família serviremos ao Senhor" },
     { book: "Colossenses", chapter: 3, startVerse: 14, endVerse: 14, note: "Acima de tudo, porém, revistam-se do amor, que é o elo perfeito" },
     { book: "Eclesiastes", chapter: 4, startVerse: 9, endVerse: 12, note: "Melhor é terem companhia do que estar sozinho... o cordão de três dobras não se rompe" },
-    { book: "1 João", chapter: 4, startVerse: 7, endVerse: 8, note: "Amados, amemos uns aos outros, pois o amor procede de Deus" }
+    { book: "1 João", chapter: 4, startVerse: 7, endVerse: 8, note: "Amados, amemos uns aos outros, pois o amor procede de Deus" },
+    { book: "1 Pedro", chapter: 4, startVerse: 8, endVerse: 8, note: "Acima de tudo, amem-se sinceramente uns aos outros" },
+    { book: "Provérbios", chapter: 17, startVerse: 17, endVerse: 17, note: "O amigo ama em todo o tempo, e o irmão nasce na adversidade" },
+    { book: "Efésios", chapter: 5, startVerse: 25, endVerse: 25, note: "Maridos, amem suas mulheres, assim como Cristo amou a igreja" }
   ],
   culpa_arrependimento: [
     { book: "1 João", chapter: 1, startVerse: 8, endVerse: 9, note: "Se confessarmos os nossos pecados, ele é fiel e justo para nos perdoar" },
     { book: "Romanos", chapter: 8, startVerse: 1, endVerse: 2, note: "Portanto, agora já não há condenação para os que estão em Cristo Jesus" },
     { book: "Salmos", chapter: 103, startVerse: 11, endVerse: 13, note: "Quanto o oriente está longe do ocidente, assim ele afasta de nós as nossas transgressões" },
-    { book: "Miquéias", chapter: 7, startVerse: 18, endVerse: 19, note: "Lançará todos os nossos pecados nas profundezas do mar" },
+    { book: "Miqueias", chapter: 7, startVerse: 18, endVerse: 19, note: "Lançará todos os nossos pecados nas profundezas do mar" },
     { book: "Salmos", chapter: 51, startVerse: 10, endVerse: 12, note: "Cria em mim um coração puro, ó Deus, e renova dentro de mim um espírito estável" },
-    { book: "Isaías", chapter: 1, startVerse: 18, endVerse: 18, note: "Ainda que os seus pecados sejam como a escarlate, eles se tornarão brancos como a neve" }
+    { book: "Isaías", chapter: 1, startVerse: 18, endVerse: 18, note: "Ainda que os seus pecados sejam como a escarlate, eles se tornarão brancos como a neve" },
+    { book: "2 Coríntios", chapter: 5, startVerse: 17, endVerse: 17, note: "Se alguém está em Cristo, nova criatura é: as coisas velhas já passaram" },
+    { book: "Salmos", chapter: 32, startVerse: 1, endVerse: 2, note: "Bem-aventurado aquele cuja transgressão é perdoada e cujo pecado é coberto" },
+    { book: "Provérbios", chapter: 28, startVerse: 13, endVerse: 13, note: "Quem encobre os seus pecados nunca prospera, mas quem os confessa e abandona alcança misericórdia" },
+    { book: "Hebreus", chapter: 8, startVerse: 12, endVerse: 12, note: "Pois perdoarei a sua maldade e não me lembrarei mais dos seus pecados" },
+    { book: "Isaías", chapter: 43, startVerse: 25, endVerse: 25, note: "Eu, eu mesmo, sou o que apago as tuas transgressões por amor de mim" },
+    { book: "Lucas", chapter: 15, startVerse: 20, endVerse: 24, note: "O pai correu, abraçou-o e o beijou... porque este meu filho estava morto e reviveu" }
   ]
 };
 
@@ -1170,17 +1308,14 @@ export function getMorePassagesForContext(params: {
     limit = 3,
   } = params;
 
-  // Normaliza o set de exclusões para comparação sem espaços e sem acentos
-  const excludedSet = new Set(
-    excludeReferences.map((r) => stripAccents(r).replace(/\s+/g, ""))
-  );
-
   const results: AlternativePassageItem[] = [];
   const addedRefs = new Set<string>();
 
   const isExcluded = (ref: string) => {
+    if (!ref) return false;
     const norm = stripAccents(ref).replace(/\s+/g, "");
-    return excludedSet.has(norm) || addedRefs.has(norm);
+    if (addedRefs.has(norm)) return true;
+    return isExcludedRef(ref, excludeReferences);
   };
 
   // 1. Prioridade A: Catálogo Curado por Tema
@@ -1219,30 +1354,7 @@ export function getMorePassagesForContext(params: {
     }
   }
 
-  // 2. Prioridade B: Busca Textual Geral se ainda precisar de mais alternativas
-  if (results.length < limit && context.trim().length >= 3) {
-    const textMatches = searchBibleFullText(context, version, 25);
-    for (const m of textMatches) {
-      if (results.length >= limit) break;
-      const startV = m.verse;
-      const endV = Math.min(startV + 1, m.verse + 1);
-      const p = getPassage(m.book, m.chapter, startV, endV, version) || getPassage(m.book, m.chapter, startV, startV, version);
-      if (p && !isExcluded(p.reference)) {
-        addedRefs.add(stripAccents(p.reference).replace(/\s+/g, ""));
-        results.push({
-          reference: p.reference,
-          note: `Passagem em ${m.book} que fala ao seu coração`,
-          fullText: p.fullText,
-          book: m.book,
-          chapter: m.chapter,
-          startVerse: p.startVerse,
-          endVerse: p.endVerse,
-        });
-      }
-    }
-  }
-
-  // 3. Prioridade C: Passagens Diversificadas de Consolo (Garantia de não repetição)
+  // 2. Prioridade B: Passagens Diversificadas de Consolo (sem repetições)
   if (results.length < limit) {
     for (const c of DIVERSE_COMFORT_VERSES) {
       if (results.length >= limit) break;
@@ -1258,6 +1370,30 @@ export function getMorePassagesForContext(params: {
           startVerse: c.start,
           endVerse: c.end,
         });
+      }
+    }
+  }
+
+  // 3. Prioridade C: Reciclagem Suave do Catálogo Temático (quando muitas passagens já foram vistas)
+  // Garante que o usuário NUNCA fica com alternativas vazias ou bloqueadas
+  if (results.length < limit && candidateCurated.length > 0) {
+    for (const c of candidateCurated) {
+      if (results.length >= limit) break;
+      const p = getPassage(c.book, c.chapter, c.startVerse, c.endVerse, version);
+      if (p) {
+        const norm = stripAccents(p.reference).replace(/\s+/g, "");
+        if (!addedRefs.has(norm)) {
+          addedRefs.add(norm);
+          results.push({
+            reference: p.reference,
+            note: c.note,
+            fullText: p.fullText,
+            book: c.book,
+            chapter: c.chapter,
+            startVerse: c.startVerse,
+            endVerse: c.endVerse,
+          });
+        }
       }
     }
   }

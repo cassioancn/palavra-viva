@@ -12,14 +12,19 @@ declare global {
 
 interface AdcashBannerProps {
   zoneId?: string;
+  format?: "300x250" | "300x100";
   className?: string;
 }
 
 export function AdcashBanner({
   zoneId = "12437738",
+  format = "300x250",
   className = "",
 }: AdcashBannerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const containerDimensionClass =
+    format === "300x100" ? "min-h-[100px] w-[300px]" : "min-h-[250px] w-[300px]";
 
   useEffect(() => {
     const container = containerRef.current;
@@ -83,7 +88,7 @@ export function AdcashBanner({
       </p>
       <div
         ref={containerRef}
-        className="min-h-[250px] w-[300px] mx-auto flex items-center justify-center overflow-hidden rounded-lg bg-sanctuary-950/60"
+        className={`${containerDimensionClass} mx-auto flex items-center justify-center overflow-hidden rounded-lg bg-sanctuary-950/60`}
       />
     </aside>
   );
