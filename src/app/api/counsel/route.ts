@@ -41,7 +41,16 @@ export async function POST(req: NextRequest) {
     const query = body.feeling?.trim() || "";
     const version = (body.version === "aa" ? "aa" : "nvi") as "nvi" | "aa";
     const mode = body.mode || "counsel";
-    const apiKey = process.env.GEMINI_API_KEY || "";
+    let apiKey = process.env.GEMINI_API_KEY || "";
+    if (!apiKey) {
+      try {
+        const { getCloudflareContext } = await import("@opennextjs/cloudflare");
+        const cfContext = await getCloudflareContext({ async: true });
+        apiKey = (cfContext?.env as any)?.GEMINI_API_KEY || "";
+      } catch {
+        // Ignora fallback se ambiente não for Cloudflare Worker runtime
+      }
+    }
 
     if (!query) {
       return NextResponse.json(
@@ -222,7 +231,12 @@ export async function POST(req: NextRequest) {
     // -------------------------------------------------------------
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const modelCandidates = [
+        "gemini-3.5-flash-lite",
+        "gemini-3.8-flash",
+        "gemini-2.5-flash-lite",
+        "gemini-1.5-flash"
+      ];
 
       const prompt = `
 Você é um conselheiro cristão acolhedor e teólogo bíblico.
@@ -242,7 +256,22 @@ Escreva uma resposta pastoral profunda, bíblica e acolhedora em formato JSON es
   "practical_step": "Uma ação prática e consoladora para o dia de hoje"
 }
 `;
-      const aiResult = await model.generateContent(prompt);
+
+      let aiResult: any = null;
+      for (const mName of modelCandidates) {
+        try {
+          const model = genAI.getGenerativeModel({ model: mName });
+          aiResult = await model.generateContent(prompt);
+          if (aiResult) break;
+        } catch (mErr: any) {
+          console.warn(`Tentativa de modelo ${mName} falhou:`, mErr?.message || mErr);
+        }
+      }
+
+      if (!aiResult) {
+        throw new Error("Nenhum modelo Gemini respondeu com sucesso.");
+      }
+
       const aiText = cleanJsonResponse(aiResult.response.text());
       const aiData = JSON.parse(aiText);
 
