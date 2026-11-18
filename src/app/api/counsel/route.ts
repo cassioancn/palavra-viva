@@ -97,6 +97,129 @@ export async function POST(req: NextRequest) {
     }
 
     // -------------------------------------------------------------
+    // ETAPA 1.B: BUSCA BÍBLICA SEMÂNTICA VIA IA (Para modo "search")
+    // Identifica o episódio, contexto e passagens exatas na Bíblia com inteligência teológica
+    // e validação canônica 100% autêntica
+    // -------------------------------------------------------------
+    if (apiKey && mode === "search") {
+      try {
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const modelCandidates = [
+          "gemini-3.5-flash-lite",
+          "gemini-3.8-flash",
+          "gemini-2.5-flash-lite",
+          "gemini-1.5-flash"
+        ];
+
+        const searchPrompt = `
+Você é um erudito bíblico e teólogo cristão especialista em toda a Bíblia Sagrada (Antigo e Novo Testamento).
+O usuário deseja localizar passagens bíblicas sobre: "${query}"
+Passagens a excluir se possível: ${excludeRefs.join(", ") || "nenhuma"}
+
+Identifique com precisão absoluta a passagem bíblica canônica (livro, capítulo e versículos) que narra exatamente este evento, fala deste personagem ou ensina este princípio.
+Se o usuário perguntar sobre algo específico (ex: "moisés não pode entrar na terra prometida", "chamado de jeremias", "jeremias vê os anjos", "visão do vale de ossos secos", "onde está a armadura de Deus"):
+- Identifique a passagem bíblica canônica autêntica mais exata onde isso ocorre.
+- Se for uma referência comumente associada a outro profeta/livro (ex: anjos e visões celestiais), aponte a passagem bíblica genuína e explique com clareza no contexto histórico.
+- Recomende até 3 passagens bíblicas alternativas diretamente correlatas.
+
+Responda ESTRITAMENTE em formato JSON com esta estrutura:
+{
+  "book": "Nome exato do livro em português (ex: Deuteronômio, Números, Jeremias, Gênesis, Isaías, Mateus, Romanos)",
+  "chapter": número_do_capítulo,
+  "start_verse": versículo_inicial,
+  "end_verse": versículo_final (máximo 6 versículos consecutivos para leitura fluida),
+  "theme_title": "Título claro e fiel ao evento ou tema bíblico",
+  "historical_context": "Breve contexto histórico-cultural de 1 parágrafo sobre a passagem",
+  "pastoral_reflection": "Reflexão pastoral profunda de 2 a 3 parágrafos aplicando o texto bíblico com empatia à necessidade do usuário",
+  "guided_prayer": "Oração calorosa, sincera e bíblica em 1ª pessoa",
+  "practical_step": "Uma ação prática e consoladora para o dia de hoje",
+  "alternatives": [
+    {
+      "book": "Nome do Livro",
+      "chapter": número,
+      "start_verse": número,
+      "end_verse": número,
+      "note": "Breve nota do porquê esta passagem se relaciona"
+    }
+  ]
+}
+`;
+
+        let aiSearchRes: any = null;
+        for (const mName of modelCandidates) {
+          try {
+            const model = genAI.getGenerativeModel({ model: mName });
+            aiSearchRes = await model.generateContent(searchPrompt);
+            if (aiSearchRes) break;
+          } catch (mErr: any) {
+            console.warn(`Tentativa de busca com ${mName} falhou:`, mErr?.message || mErr);
+          }
+        }
+
+        if (aiSearchRes) {
+          const aiJson = cleanJsonResponse(aiSearchRes.response.text());
+          const aiData = JSON.parse(aiJson);
+
+          if (aiData.book && aiData.chapter && aiData.start_verse) {
+            const endV = aiData.end_verse || aiData.start_verse;
+            // Auditoria canônica local rigorosa: garante que os versículos realmente existem no cânon autêntico
+            const validatedPassage = getPassage(aiData.book, aiData.chapter, aiData.start_verse, endV, version);
+
+            if (validatedPassage && !isExcluded(validatedPassage.reference)) {
+              // Validação canônica das alternativas
+              const validAlternatives: any[] = [];
+              if (Array.isArray(aiData.alternatives)) {
+                for (const alt of aiData.alternatives) {
+                  if (alt.book && alt.chapter && alt.start_verse) {
+                    const altEnd = alt.end_verse || alt.start_verse;
+                    const p = getPassage(alt.book, alt.chapter, alt.start_verse, altEnd, version);
+                    if (p && !isExcluded(p.reference) && p.reference !== validatedPassage.reference) {
+                      validAlternatives.push({
+                        reference: p.reference,
+                        note: alt.note || `${p.book} ${p.chapter}`,
+                        fullText: p.fullText,
+                        book: p.book,
+                        chapter: p.chapter,
+                        startVerse: p.startVerse,
+                        endVerse: p.endVerse,
+                      });
+                    }
+                  }
+                }
+              }
+
+              if (validAlternatives.length === 0) {
+                validAlternatives.push(
+                  ...getMorePassagesForContext({
+                    context: query,
+                    themeId: body.themeId,
+                    excludeReferences: [validatedPassage.reference, ...excludeRefs],
+                    version,
+                    limit: 3,
+                  })
+                );
+              }
+
+              return NextResponse.json({
+                success: true,
+                isAiGenerated: true,
+                themeTitle: aiData.theme_title || validatedPassage.reference,
+                passage: validatedPassage,
+                pastoralReflection: aiData.pastoral_reflection,
+                historicalContext: aiData.historical_context,
+                guidedPrayer: aiData.guided_prayer,
+                practicalStep: aiData.practical_step,
+                alternativePassages: validAlternatives.slice(0, 3),
+              });
+            }
+          }
+        }
+      } catch (aiSearchErr) {
+        console.warn("Busca semântica via IA falhou, prosseguindo com motor determinístico local:", aiSearchErr);
+      }
+    }
+
+    // -------------------------------------------------------------
     // ETAPA 2: RESOLUÇÃO BÍBLICA DETERMINÍSTICA LOCAL (Garantia de 100% de relevância)
     // -------------------------------------------------------------
     let candidateResponse: ResolvedBibleResponse | null = null;

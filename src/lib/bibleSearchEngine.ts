@@ -742,6 +742,89 @@ export const BIBLICAL_STORIES: BiblicalStoryItem[] = [
     guidedPrayer: "Jesus querido, eu entrego aos Teus pés todo o meu cansaço, preocupações e ansiedades. Dá descanso e alívio à minha alma. Amém.",
     practicalStep: "Desconecte-se de redes e afazeres por 15 minutos e descanse em oração silenciosa na presença de Deus.",
   },
+  {
+    id: "moises-terra-prometida",
+    title: "Moisés e a Visão da Terra Prometida no Monte Nebo",
+    book: "Deuteronômio",
+    chapter: 32,
+    startVerse: 48,
+    endVerse: 52,
+    keywords: [
+      "moises nao pode entrar na terra prometida",
+      "moises nao entra na terra prometida",
+      "moises terra prometida",
+      "monte nebo",
+      "ver a terra prometida",
+      "morte de moises",
+      "terra prometida moises",
+      "moises nao entra",
+    ],
+    historicalContext: "No final dos 40 anos de peregrinação no deserto, Deus conduz Moisés ao cume do monte Nebo e lhe mostra toda a terra de Canaã, lembrando que Josué lideraria a entrada do povo.",
+    reflection: "Mesmo diante dos limites terrenos e das consequências de nossas falhas humanas, o amor e a fidelidade de Deus permanecem firmes. Moisés contemplou o cumprimento da promessa divina, ensinando-nos que os planos eternos do Senhor transcendem as nossas próprias vidas.",
+    guidedPrayer: "Senhor meu Deus, reconheço a Tua soberania e santidade. Ajuda-me a confiar que os Teus propósitos são perfeitos, mesmo quando não compreendo todos os limites da caminhada. Em nome de Jesus, amém.",
+    practicalStep: "Agradeça a Deus pelas bênçãos que Ele já permitiu você vivenciar e confie o futuro das suas promessas nas mãos Dele.",
+  },
+  {
+    id: "chamado-e-visoes-de-jeremias",
+    title: "O Chamado Profético e as Visões de Jeremias",
+    book: "Jeremias",
+    chapter: 1,
+    startVerse: 4,
+    endVerse: 10,
+    keywords: [
+      "chamado de jeremias",
+      "jeremias profeta",
+      "vara de amendoeira",
+      "panela fervente",
+      "antes que te formasse no ventre",
+      "jeremias ve os anjos",
+      "visoes de jeremias",
+      "jeremias anjos",
+    ],
+    historicalContext: "Deus comissiona o jovem Jeremias em Judá como profeta às nações antes do exílio babilônico, tocando em sua boca e revelando visões que confirmam a vigilância divina sobre Sua Palavra.",
+    reflection: "Deus não escolhe pessoas perfeitas ou autossuficientes, mas capacita aqueles que se colocam com coração humilde diante Dele. Quando nos sentimos pequenos ou despreparados, a presença e a autoridade do Senhor são o nosso escudo e a nossa força.",
+    guidedPrayer: "Senhor Deus, Tu que me conheces antes mesmo do meu nascimento, tira todo o medo e sentimento de incapacidade do meu coração. Usa a minha vida para Tua honra e glória. Amém.",
+    practicalStep: "Não tenha receio de dar um passo de fé e amor por alguém hoje, lembrando que a graça de Deus se aperfeiçoa na sua fraqueza.",
+  },
+  {
+    id: "jaco-escada-dos-anjos",
+    title: "Jacó e o Sonho da Escada com os Anjos de Deus (Betel)",
+    book: "Gênesis",
+    chapter: 28,
+    startVerse: 10,
+    endVerse: 17,
+    keywords: [
+      "jaco escada dos anjos",
+      "escada de jaco",
+      "anjos subiam e desciam",
+      "sonho de jaco anjos",
+      "betel porta dos ceus",
+      "visao dos anjos jaco",
+    ],
+    historicalContext: "Em fuga de Esaú para Harã, Jacó adormece com uma pedra por travesseiro e tem a visão celestial da escada que une a terra ao céu, onde Deus reafirma a promessa abraâmica.",
+    reflection: "Mesmo em momentos de fuga, solidão e incerteza, os céus estão abertos sobre nós. A escada aponta para a comunhão constante entre Deus e os homens, confirmada em Cristo como o caminho vivo para o Pai.",
+    guidedPrayer: "Senhor, abre os olhos da minha fé para perceber a Tua presença e a Tua proteção nos momentos mais solitários da minha caminhada. Em nome de Jesus, amém.",
+    practicalStep: "Lembre-se hoje de que você nunca está sozinho: a presença e o cuidado do Deus de Betel estão com você onde quer que você for.",
+  },
+  {
+    id: "visao-vale-de-ossos-secos",
+    title: "A Visão do Vale de Ossos Secos e a Restauração",
+    book: "Ezequiel",
+    chapter: 37,
+    startVerse: 1,
+    endVerse: 10,
+    keywords: [
+      "vale de ossos secos",
+      "ossos secos",
+      "ossos secos viverao",
+      "profetiza aos ossos",
+      "vem dos quatro ventos o espirito",
+    ],
+    historicalContext: "O profeta Ezequiel no cativeiro babilônico recebe a visão da ressurreição de um exército a partir de ossos secos, simbolizando a restauração nacional e espiritual de Israel.",
+    reflection: "Não há situação tão morta ou destruída que o sopro do Espírito de Deus não possa vivificar. Onde os olhos humanos veem apenas fim e sequidão, Deus é capaz de gerar um exército de vida e esperança.",
+    guidedPrayer: "Espírito Santo de Deus, sopra sobre as áreas da minha vida que parecem secas e sem esperança. Traz vida, alento e restauração ao meu coração. Amém.",
+    practicalStep: "Declare palavras de vida e esperança sobre a sua família e seus projetos, crendo no poder restaurador do Senhor.",
+  },
 ];
 
 // -------------------------------------------------------------
@@ -842,7 +925,7 @@ export function searchBibleFullText(
 ): ScoredVerseMatch[] {
   if (!rawQuery || rawQuery.trim().length < 2) return [];
 
-  const cleanQ = stripAccents(rawQuery);
+  const cleanQ = stripAccents(rawQuery).replace(/[^\w\s]/g, " ").trim();
   const originalTerms = tokenize(rawQuery);
   if (originalTerms.length === 0) return [];
 
@@ -851,44 +934,67 @@ export function searchBibleFullText(
   const flat = getFlatVerses(version);
   const scored: ScoredVerseMatch[] = [];
 
+  // Identifica menções a livros ou personagens centrais na busca
+  const cleanTokens = cleanQ.split(/\s+/);
+  const queryBookOrHero = cleanTokens.filter((tok) =>
+    [
+      "moises", "jeremias", "davi", "abraao", "jesus", "cristo", "paulo", "pedro",
+      "elias", "eliseu", "jose", "salomao", "isaias", "ezequiel", "daniel", "joao"
+    ].includes(tok)
+  );
+
   for (let i = 0; i < flat.length; i++) {
     const fv = flat[i];
     let score = 0;
 
     // 1. Frase idêntica
-    if (fv.clean.includes(cleanQ)) {
-      score += 250;
+    if (cleanQ.length > 3 && fv.clean.includes(cleanQ)) {
+      score += 300;
     }
 
-    // 2. Acertos de termos originais (sub-string matching rápido, sem overhead de regex)
+    // 2. Acertos de termos originais (sub-string matching rápido)
     let origHits = 0;
     for (let t = 0; t < originalTerms.length; t++) {
       const term = originalTerms[t];
       const st = originalStems[t];
       if (fv.clean.includes(term)) {
         origHits++;
-        score += 35;
+        score += 40;
       } else if (st.length >= 3 && fv.clean.includes(st)) {
         origHits++;
         score += 25;
       }
     }
 
-    // Bônus se múltiplos termos originais estiverem no versículo
-    if (origHits === originalTerms.length && originalTerms.length > 1) {
-      score += 80;
-    } else if (originalTerms.length > 2 && origHits >= originalTerms.length - 1) {
-      score += 40;
+    // Bônus proporcional de cobertura dos termos buscados
+    const coverage = origHits / originalTerms.length;
+    score += Math.round(coverage * 120);
+
+    // Se o usuário buscou por um personagem ou livro específico (ex: Jeremias, Moisés),
+    // prioriza fortemente o livro correspondente ou a presença do personagem
+    const fvBookClean = stripAccents(fv.book).toLowerCase();
+    for (const hero of queryBookOrHero) {
+      if (fvBookClean === hero || fvBookClean.includes(hero)) {
+        score += 150;
+      }
+      if (fv.clean.includes(hero)) {
+        score += 100;
+      }
     }
 
     // 3. Casamento de sinônimos/termos expandidos
     for (let e = 0; e < expandedTerms.length; e++) {
       if (fv.clean.includes(expandedTerms[e])) {
-        score += 12;
+        score += 10;
       }
     }
 
-    if (score >= 35) {
+    // Filtro de relevância: se a busca tem 3 ou mais termos e cobriu menos de 40%, ignora
+    if (originalTerms.length >= 3 && coverage < 0.4 && !fv.clean.includes(cleanQ)) {
+      continue;
+    }
+
+    if (score >= 45) {
       scored.push({
         book: fv.book,
         chapter: fv.chapter,
@@ -897,10 +1003,6 @@ export function searchBibleFullText(
         score,
         reference: `${fv.book} ${fv.chapter}:${fv.verse}`,
       });
-      // Se encontrou versículos com alta pontuação suficiente, encerra cedo para poupar CPU
-      if (scored.length >= 40 && score >= 200) {
-        break;
-      }
     }
   }
 
